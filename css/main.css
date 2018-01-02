@@ -1,0 +1,191 @@
+/* haha bad idea select { height: 3em; } */
+body { font: 12px Verdana, Helvetica, Arial, sans-serif; }
+
+span.phrase {text-transform: capitalize; }
+h1,h2,h3,h4,label,th, { text-transform: capitalize; } /* I hate capitalizing */
+/* ^^ those are temporary since css handles capitalizatin in such a sophomoric way */
+
+table td { padding: 4px; }
+
+table th { font-size: 14px; }
+
+input.button { text-transform:capitalize; }
+
+ul.headers li { text-transform:capitalize; }
+
+.small_number_text { width: 3em; }
+.student_letter_container { overflow: visible; }
+
+#login_holder { margin-top: 8px; }
+
+.login_label { 
+    border: 0px solid red;
+    margin-right: 10px;
+    display: block;
+    float: left;
+    text-align: left;
+    font-weight: bold;
+    width: 80px;
+}
+
+.login_search_label {
+    font-size: 14px;
+}
+#login_edit label {
+    text-align: left;
+    font-weight: bold;
+    font-size: 14px;
+    width: 100%;
+}
+
+.login_error_div {
+    border: 0px solid red;
+    bottom: 1.5em;
+    left: 278px;
+    position: relative;
+}
+
+.login_error { display: none; color: #EE3631; font-weight: bold; }
+.login_success { display: none; color: #004fa0; font-weight: bold; }
+
+div#login_msg { 
+display: none;
+font-size: 16px;
+}
+
+#main_nav {
+    float: left;
+    width: 100%;
+} /* UL holding the nav links */
+
+
+#main_nav .nav_item {
+    list-style-type: none;
+    float: left;
+    min-width: 20%;
+} /* list items holding the nav links */
+
+#main_nav button {} /* style all nav buttons */
+
+#login_holder, #request_password {
+    width: 100%;
+} 
+
+#request_password { }
+
+#login_holder label { } /* labels inside the login */
+
+#login_holder {
+    margin-right: 5%;
+}
+
+#logIn {
+    display: block;
+    clear: both;
+    height: auto;
+}
+
+#logIn h3 {
+    margin-top: 0px;
+    margin-bottom: 4px;
+}
+
+.instructions { 
+    margin: 4px 0px;
+	padding: 4px;
+	border: 2px solid #222222;
+	border-radius: 4px;
+	background-color: #ffffff;
+	color: #222222;
+}
+
+.color_key {
+    clear: both;
+}
+
+.instructions h3 {
+    float: left;
+	margin-right: 12px;
+	margin-top: 6px;
+	margin-left: 2px;
+}
+
+table.color_key {
+    width: 78%;
+}
+
+table.color_key td {
+    text-align: center; width: 50%; padding: 6px; margin-right: 6px;
+}
+#logout_button {} /* button to log yourself out */
+
+#login_holder button {} /* style all login buttons */
+
+/* billing admin */
+/*
+.status_4 td { background-color: #ffffff; }
+.status_3 td { background-color: #ec6372; }
+.status_2 td { background-color: #ffffff; }
+.status_1 td { background-color: #ec6372; }
+*/
+
+#billing_table {
+    width: 90%;
+}
+
+tr.unpaid td {
+    background-color: #ec6372;
+}
+
+tr.partially_paid td {
+    background-color: #ffee00;
+}
+
+.event_card .unpaid, .event_card .partially_paid {
+    background-color: #ec6372;
+}
+/* parent billing */
+
+#participant_billing_invoice {
+    border-width: 0px;
+    border-spacing: 0px;
+    border-style: none;
+    border-color: #888888;
+    border-collapse: collapse;
+    width:100%;
+}
+
+#participant_billing_invoice th {
+    border-width: 1px;
+    padding: 1px;
+    border-style: inset;
+    border-color: black;
+    background-color: #ffffff;
+}
+
+#participant_billing_invoice td {
+    border-width: 1px;
+    padding: 3px;
+    border-style: inset;
+    border-color: black;
+    background-color: #ffffff;
+}
+
+td.money {
+    text-align: right;
+}
+td.paid {
+    color: #129912;
+    font-weight: bold;
+}
+input.input_money {
+    width: 54px;
+    text-align: right;
+    padding: 2px;
+    margin-left: 2px;
+}
+td.total_row { font-weight: bold; }
+
+
+/* CRM */
+td.waiver_status { width: 72px; }

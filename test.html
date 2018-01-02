@@ -1,0 +1,23 @@
+<html>
+<head>
+<script type="text/javascript" src="./js/clipboard.min.js"> </script>
+</head>
+
+<body>
+
+
+<!-- Target -->
+
+<!-- Trigger -->
+<button class="btn" id="btn" data-clipboard-target="#foo">
+    <img src="assets/clippy.svg" alt="Copy to clipboard">
+<input style="width: 1px; height: 1px;" id="foo" type="text" value="Now you have the other">
+</button>
+<script>
+    var btn = document.getElementById('btn');
+    var clipboard = new Clipboard(btn);
+</script>
+
+</body>
+</html>
+

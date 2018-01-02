@@ -1,0 +1,325 @@
+/* error checking */
+
+html body {
+    background-color: #166ab8;
+}
+
+#reg h1 {
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    font-size: 42px;
+}
+
+#reg label.error {
+    margin-right: -10em;
+    margin-left: -10em;
+    z-index: 10000;
+    border: 2px solid #ff8888;
+    background-color: #ffaaaa;
+    border-radius: 2px;
+    opacity: 0.8;
+    left: 18px;
+    top: 18px;
+    position: relative;
+}
+
+#reg_sig_wrap label.error {
+    float: right;
+}
+
+/* registration */
+
+/* login registration form */
+
+#regAddressTabs {
+    padding-bottom: 4em;
+}
+
+#addressTypeTabs label, .payment_form .reg_name label {
+    display: block;
+}
+
+#addressTypeTabs .reg_name, .payment_form .reg_name  {
+    float: left;
+}
+
+#addressTypeTabs .reg_phones {
+    clear: both;
+    width: 100%;
+    display: block;
+    margin-bottom: 3em; /* don't ask me */
+}
+
+#addressTypeTabs .reg_phone {
+    float: left;
+}
+
+#addressTypeTabs .reg_addresses {
+    clear: left;
+    display: block;
+}
+
+#addressTypeTabs .reg_address {
+    float: left;
+}
+
+/* span.question_1, span.question_2 { display: block; }  */
+
+.reg_section {
+    width: 90%;
+    border-radius: 4px;
+    border: 2px solid #aaaaaa;
+    padding: 0em 3em 4em;
+    margin: 20px; 0;
+    background-color: #ffffff;
+}
+
+.register_checkboxes { 
+    float: left;
+    margin-right: 14px;
+}
+
+.register_textarea textarea { 
+    width: 80%;
+    height:  8em;
+}
+
+.reg_holder div {
+    /* margin-bottom: 14px; */
+}
+
+/*
+ * no, and no, and no.
+.reg_holder h3, .reg_section h3 {
+    text-transform: capitalize;
+}
+*/
+div.break_row{
+    display: block; 
+}
+
+.div_text label { 
+    width: 14em; 
+    text-align: left; 
+    margin-right: 20px; 
+    border: 0px solid red; 
+}
+
+div.register_radio { 
+    float: right;
+}
+
+div.register_radio input {
+    margin-top: 0px;
+}
+
+.register_radio label { 
+    margin-right: 2em;
+    padding-left: 1em;
+    position: relative;
+    /* bottom: 4px; */
+}
+
+.reg_question_text_container { 
+    position: relative;
+    font-size: 13px;
+    /* top: 6px; I don't know why */
+}
+
+.reg_question_text_container label { 
+    display: block;
+    white-space: nowrap;
+    /* margin-top: 14px; */
+    margin-bottom: 12px;
+}
+
+.div_radio .reg_question_text_container label {
+    display: inline;
+}
+
+.reg_holder .div_radio {
+    font-weight: bold;
+    max-width: 430px;
+    min-width: 340px;
+    display: block;
+    float: left;
+    margin-top: 14px;
+}
+
+.reg_holder .div_radio input {
+    margin-left: 1em;
+}
+
+.div_textarea {
+    display: block;
+    clear: both;
+}
+
+/* specific to this form */
+/* and should actually be only in SwimFloatSwim */
+/* and swim kids georgia */
+
+
+.reg_holder .reg_section_1 input {
+    margin-left: 0;
+}
+
+.reg_section_1 .div_radio .reg_question_text_container {
+    /* this is custom to this form */
+    display: block;
+    margin-bottom: 0.8em;
+}
+
+.reg_holder .reg_section_3 div.register_radio { 
+}
+
+.reg_holder .reg_section_3 > div {
+    margin-right: 3em;
+}
+
+.div_friend_referral_name {
+    display: block;
+    clear: left;
+}
+
+.reg_holder .div_gender {
+    width: 100%;
+    display: block;
+    float: none;
+    margin-bottom: 12px;
+}
+
+.reg_holder .div_gender .reg_question_text_container {
+    display: inline;
+}
+
+.reg_holder .div_gender .register_radio {
+    position: relative;
+    bottom: 4px;
+}
+
+.div_birth_weight, .div_height { 
+    float: left;
+    margin-right: 6px;
+}
+
+.div_birth_term .register_radio {
+    float: none;
+}
+
+.div_icu .register_radio {
+    float: none;
+}
+
+.div_oxygen_needed .register_radio {
+    float: none;
+}
+.reg_holder .div_birth_term {
+    max-width: 267px;
+    min-width: 267px;
+}
+.reg_holder .div_weeks_premature {
+    float: left;
+    max-width: 165px;
+    min-width: 165px;
+    margin-top: 14px;
+}
+.reg_holder .div_icu { 
+    float: left;
+    max-width: 267px;
+    min-width: 179px;
+}
+.text_weeks_premature, .text_sit_alone, .text_crawl, .text_stand_alone, .text_walk {
+    width: 4em;
+}
+.reg_holder .div_sit_alone {
+    float: left;
+    max-width: 165px;
+    min-width: 165px;
+}
+.reg_holder .div_crawl {
+    float: left;
+    max-width: 165px;
+    min-width: 165px;
+}
+.reg_holder .div_stand_alone {
+    float: left;
+    max-width: 165px;
+    min-width: 165px;
+}
+
+.reg_holder .div_pediatricians_name {
+    clear: left;
+}
+
+.reg_holder .div_walk {
+    float: left;
+}
+
+.further_information_about_medical_conditions-37 {
+    width: 42em;
+    height: 8em;
+}
+/* payment */
+
+#payment_buttons {
+    margin: 0 1em 1em 0;
+}
+
+#payment_buttons a {
+    margin: 0 1em;
+    font-weight: bold;
+}
+
+.payment_form label { 
+    text-transform: capitalize; 
+    display: block;
+}
+
+.payment_form .reg_contact {
+    display: block;
+    width: 100%;
+    clear: right;
+}
+.payment_form .reg_contact > div {
+    float: left;
+}
+
+.payment_form .reg_addresses {
+    clear: left;
+    display: block;
+}
+
+.reg_addresses .reg_address {
+    float: left;
+}
+
+.payment_form .reg_email {
+    /* float: left; */
+}
+
+.payment_doc {
+    margin: 2em auto;
+}
+
+/* signature pad */
+
+.signature_date { 
+    margin-top: 12px; 
+    font-size: larger;
+    font-weight: bold;
+}
+
+body .sigWrapper {
+    height: 101px;
+}
+
+/* jquery ui override(s) */
+.ui-button-text-only .ui-button-text {
+    font-size: 72%;
+}
+
+#payment_buttons .ui-button-text-only .ui-button-text {
+    font-size: 100%;
+}

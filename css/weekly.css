@@ -1,0 +1,299 @@
+/* testing */
+/*
+#phase2 .event_daily_display:hover {
+    width: 82% !important;
+    height: 200px !important;
+    position: absolute;
+    z-index: 6000;
+    top: 0px;
+}
+#phase2 div.time_row {
+    position: relative;
+}
+*/
+
+
+table.schedule_nav {
+    width: 100%;
+    background-color: #cdab89;
+    margin-top: 18px;
+}
+
+table.schedule_nav th {
+}
+
+#scroll_nav_holder, #scroll_nav_title {
+    display: none;
+}
+
+.scrollArrow {
+    margin: 0 18px;
+    position: relative;
+    display: none;
+}
+
+#hold_schedule {
+    width: 1000px;
+}
+
+#closehds {
+    z-index: 10000;
+    font-size: 16px;
+    font-weight: bold;
+    float: right;
+    padding: 14px;
+    cursor: pointer;
+}
+
+#hold_daily_schedule {
+    z-index: 9000;
+    width: 1000px;
+    height: 90%;
+    overflow: auto;
+    background-color: #ffffff;
+    border: 2px solid black;
+    border-radius: 5px 5px 5px 5px;
+    position: absolute;
+    top: 10px;
+    display: none;
+}
+
+#daily_schedule {
+    border-collapse: collapse;
+    border: 1px solid #000000;
+    padding-left: 18px;
+}
+
+#daily_schedule table.inner_table {
+    border-collapse: collapse;
+    width: 798px;
+}
+
+#daily_schedule .ped_meta:hover {
+    cursor: pointer;
+}
+
+#daily_schedule .inner_table td, #daily_schedule .inner_table th {
+    border: 1px solid black;
+    padding: 8px
+}  
+
+.daily_schedule_participant { 
+    white-space: nowrap; 
+    font-weight: bold;
+}
+
+td.daily_private {
+    color: #ffffff;
+    background-color: #000000;
+    border-right: 1px solid #ffffff !important;
+}
+
+
+.daily_schedule_login { 
+    padding-left: 1.5em;
+}
+
+th.daily_header { border-bottom: 1px solid #000000; border-right: 1px solid #000000; }
+
+th.daily_header.spacer { border-right: 0px solid #000000; }
+
+
+td.daily_students { white-space: nowrap; }
+
+th.shade1, td.shade1 { background-color: #fafafa; }
+
+/*
+td.daily_event, td.daily_location, td.daily_leader {
+    width: 205px;
+}
+*/
+
+td.daily_box { width: 114px; border-right: 1px solid #000000; }
+
+td.daily_pname, td.daily_page, td.daily_leader, td.daily_login, td.daily_week {
+    width: 123px;
+}
+
+td.hour_display {
+    background-color: #EFEFEF;
+    border-bottom: 1px solid #000000;
+    border-right: 1px solid #000000;
+    font-size: 48px;
+    font-weight: bold;
+    padding: 0 18px;
+    text-align: center;
+}
+
+td.event_time {
+    text-align: right;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+#schedule {
+    position: relative;
+    left: 0px;
+}
+#goleft {
+    position: relative;
+    right: 14px;
+}
+table.day_container {
+    border-right:3px solid rgb(164, 186, 250);
+    border-left:3px solid rgb(164, 186, 250);
+    border-bottom:3px solid rgb(164, 186, 250);
+    /*
+    -webkit-border-radius: 19px 19px 0px 0px;
+    -moz-border-radius: 19px 19px 0px 0px;
+    border-radius: 19px 19px 0px 0px;
+    */
+    border-spacing: 0;
+    width: 410px;
+    font-size: 11px;
+    float: left;
+    margin-left: 24px;
+    margin-top: 24px;
+}
+table.day_container td { 
+    /* border-bottom: 1px solid #1895cf;  */
+    border-bottom: 1px solid rgb(164, 186, 250);
+    border-spacing:0;
+}
+
+.day_control {
+    display: block;
+    width:100%;
+}
+
+.day_control.button {
+    float: left;
+}
+
+table.day_container .active { /* background-color:#ffffee; */ margin: 4px;}
+
+table.day_container .event { padding: 4px 4px 0px 2px; margin-left: 74px;}
+
+div.time_top_row {
+    margin-top: 12px;
+}
+div.time_row {
+    height: auto;
+    min-height: 3em;
+}
+
+body td.day_name_container {
+    background-color: #cdab89;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: Helvetica, Arial, sans-serif;
+    /* border-radius: 15px 15px 0px 0px; */
+    box-shadow: 2px 2px 2px #888;
+}
+div.popup { display: none; }
+
+div.event_daily_display { 
+    height: auto;
+    width: 165px;
+    border: 1px solid black;
+    /* background-color: #a4bafa; */
+    background-color: #89abcd;
+    margin-right: 1%;
+    float: left;
+    position: relative;
+    bottom: 2em;
+    font-size: larger;
+    padding: 3px;
+    
+}
+
+div.time_cell {
+    clear: both;
+}
+
+div.event_daily_display:hover {
+    box-shadow: 2px 2px 2px #888888;
+    position: relative;
+    /* z-index: 600; */
+    cursor: pointer;
+}
+
+div.event_daily_display_mult {
+    /* background-color: #A4B2A9; */
+    float: left;
+    margin-left: 14px;
+    /* margin-top: -28px; */
+    margin-top: -48px;
+    height: 50px !important; /* not sure about this but it keeps 1 multi inside the time it's scheduled */
+    opacity: 0.9;
+    box-shadow: 2px 2px 2px #888;
+}
+
+span.show_time { 
+    font-size: 15px; 
+}
+
+td.day_container_er_container { border: 1px solid green; }
+
+/* custom colors for locations */
+div.round_pool {
+    background-color: #89cdcd;
+}
+
+/* custom class for modal */
+#show_schedule #myModal {
+    width: auto;
+}
+
+/* class details on weekly schedule */
+
+#phase2 div.time_row {
+    position: relative;
+}
+.detail_container { background-color: #ffffff; 
+    border: 1px solid black;
+    display: none;
+    width: 82% !important;
+    height: 250px !important;
+    position: absolute;
+    top: 0px;
+    z-index: 6000;
+}
+
+/* new popup */
+
+span.detail_hover { 
+    width: 72px;
+    height: 2.2em;
+    display: inline-block;
+}
+
+table.display_event { width: 100%; }
+table.display_event td {border-bottom: 0 }
+.private_0_round { background-color: rgb(0,0,255); }
+.private_0_lap { background-color: rgb(0,128,0); }
+.private_0_no { background-color: rgb(192,64,0); }
+
+.private_1_round { background-color: rgb(0,128,255); }
+.private_1_lap { background-color: rgb(0,192,0); }
+.private_1_no { background-color: rgb(192,64,0); }
+
+.private_2_round { background-color: rgb(0,192,255); }
+.private_2_lap { background-color: rgb(192,255,255); }
+.private_2_no { background-color: rgb(192,64,0); }
+
+
+.group_0_round { background-color: rgb(192,192,255); }
+.group_0_lap { background-color: rgb(0,255,255); }
+.group_0_no { background-color: rgb(192,144,96); }
+
+.group_1_round { background-color: rgb(192,128,255); }
+.group_1_lap { background-color: rgb(0,192,192); }
+.group_1_no { background-color: rgb(192,144,96); }
+
+.group_2_round { background-color: rgb(128,0,255); }
+.group_2_lap { background-color: rgb(0,128,128); }
+.group_2_no { background-color: rgb(192,144,96); }
+
+

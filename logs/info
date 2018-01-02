@@ -1,0 +1,48 @@
+Array
+(
+    [1813] => Array
+        (
+            [line_item] => Group Classes Spring 2014
+            [pay] => 25.00
+            [full_name] => Eli Stubbs
+        )
+
+    [1955] => Array
+        (
+            [line_item] => Group Classes Spring 2014
+            [pay] => 25.00
+            [full_name] => Zac Stubbs
+        )
+
+    [1774] => Array
+        (
+            [line_item] => Group Classes Spring 2014
+            [pay] => 25.00
+            [full_name] => Ava Stubbs
+        )
+
+)
+Array
+(
+    [1813] => Array
+        (
+            [line_item] => Beginning Stroke 1
+            [pay] => 458.00
+            [full_name] => Eli Stubbs
+        )
+
+    [1955] => Array
+        (
+            [line_item] => Funday
+            [pay] => 458.00
+            [full_name] => Zac Stubbs
+        )
+
+    [2067] => Array
+        (
+            [line_item] => 
+            [pay] => 458.00
+            [full_name] => Ava Stubbs
+        )
+
+)

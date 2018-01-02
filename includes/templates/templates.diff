@@ -1,0 +1,185 @@
+--- ../templates//div_weekly_schedule.php	2014-06-07 11:10:01.000000000 -0500
++++ ../../../schedule/includes/templates//div_weekly_schedule.php	2014-03-05 23:21:13.000000000 -0600
+copy from new_schedule to schedule
+@@ -13,17 +13,14 @@
+     <?php 
+         echo $day_name;
+     ?> 
+-    <div class="day_control">
+-    <button class="print_day print_button" id="print_<?php echo $cal_date; ?>" class="print_day"><img style="width:16px; height: 16px;" src="images/printer.svg"></button>
+-    </div>
+     </td>
+     </tr>
+     <td colspan="2">
+     <?php
+-    $current_time_hour   = $daily_start_hour;
++    $current_time_hour = $daily_start_hour;
+     $current_time_minute = $daily_start_minute;
+-    $current_unix_time   = date('U', mktime($daily_start_hour, $daily_start_minute, 0, $this_month, $current_day_number, $this_year));
+-    $end_unix_time       = date('U', mktime($daily_end_hour, $daily_end_minute, 0, $this_month, $current_day_number, $this_year));
++    $current_unix_time = date('U', mktime($daily_start_hour, $daily_start_minute, 0, $this_month, $current_day_number, $this_year));
++    $end_unix_time =  date('U', mktime($daily_end_hour, $daily_end_minute, 0, $this_month, $current_day_number, $this_year));
+     while($current_unix_time < $end_unix_time) {
+         // initialize some variables
+         $total_duration=0;
+@@ -81,17 +78,20 @@
+                 $event_increment=0;
+                 foreach($e[$check_event] as $val) {
+                     /* extract($val); */
+-                    $daytime                   = $val['daytime'];
+-                    $et_name                   = $val['et_name'];
+-                    $location                  = $val['location'];
+-                    $privgroup                 = $val['privgroup'];
+-                    $leader                    = $val['leader'];
+-                    $fname                     = $val['fname'];
+-                    $id                        = $val['id'];
+-                    $participant_fullname      = $val['participant_fullname'];
+-                    $duration                  = $val['duration'];
+-                    $event_type                = $val['event_type'];
+-                    $private_event_daytime_id  = $val['private_event_daytime_id'];
++                    $daytime = $val['daytime'];
++                    $et_name = $val['et_name'];
++                    $location = $val['location'];
++                    $privgroup = $val['privgroup'];
++                    $fname = $val['fname'];
++                    $id = $val['id'];
++                    $participant_fullname = $val['participant_fullname'];
++                    $duration = $val['duration'];
++                    $event_type = $val['event_type'];
++                    $private_event_daytime_id = $val['private_event_daytime_id'];
++                    /*foreach($val as $tkey => $subval) {
++                        $test_ret.="$".$tkey.' = '.$subval.';<br>';
++                    }
++*/
+                     if($event_increment > 0) {
+                         $extra_event_class = ' event_daily_display_mult ';
+                         $extra_event_style= 'style="margin-left: 60px"';
+diff -u ../templates//event_card.php ../../../schedule/includes/templates//event_card.php
+--- ../templates//event_card.php	2014-01-11 20:35:52.000000000 -0600
++++ ../../../schedule/includes/templates//event_card.php	2014-06-26 18:36:18.000000000 -0500
+copy from schedule to new_schedule
+@@ -38,7 +38,8 @@
+                         $participant_id        = $pointer['participant_id'];
+                         $status_id             = $pointer['status_id'];
+                         $event_participant_id  = $pointer['event_participant_id'];
+-                        $extra_style          .= ' '.str_replace(' ','_',strtolower($status_arr[$status_id])).' ';
++                        $pay_status            = $pointer['pay_status']; // this takes precedence over event_participant_status' fully_paid because that really shouldn't be there.
++                        $extra_style          .= ' '.str_replace(' ','_',strtolower($status_arr[$status_id])).' '.$pay_status.' ';
+                         if(is_array($login_part_arr)) {
+                             if(is_array($login_part_arr[$participant_id])) {
+                                 $show_config=true;
+@@ -94,6 +95,9 @@
+                 </div>
+         
+                 <?php 
++                if($show_shelf == false) {
++                    $show_config = false;
++                }
+                     if($show_config == true) {
+                         echo $shelf;
+                     } else {
+Only in ../../../schedule/includes/templates/: num.php
+Only in ../templates/: printable_daily_schedule.php
+Only in ../templates/: private_block_picker.php
+Only in ../templates/: private_card_picker.php
+diff -u ../templates//private_event_card.php ../../../schedule/includes/templates//private_event_card.php
+--- ../templates//private_event_card.php	2014-06-03 18:09:59.000000000 -0500
++++ ../../../schedule/includes/templates//private_event_card.php	2014-03-25 22:12:49.000000000 -0500
+copy from new_schedule but be glad you have a backup
+@@ -1,14 +1,25 @@
++<div style="float: left;">
++<select name="pe_dates" id="pe_dates">
++<?php echo $pe_dates; ?>
++</select>
++    <input type="button" name="pe_event_dates" value="<?php echo $sl->gp('Go!'); ?>">
++</div>
+ <?php
+ if(is_array($priv_event)) {
+ ?>
++    <div>
+     <table>
+     <tr>
++        <td colspan="5">
++            <?php echo $pecard_title; ?>
++            <?php echo $pecard_picker; ?>
++        </td>
++    </tr>
+     <tr>
+         <td class="pecard_header">Time</td>
+         <td class="pecard_header">Name</td>
+         <td class="pecard_header">Age</td>
+         <td class="pecard_header">Parent</td>
+-        <td class="pecard_header">Instructor</td>
+         <td class="pecard_header">Week</td>
+     </tr>
+ <?php
+@@ -18,7 +29,6 @@
+         $dob                     = $pe_arr['dob'];
+         $participant_age         = $pe_arr['participant_age'];
+         $login_fullname          = $pe_arr['login_fullname'];
+-        $leader                  = $pe_arr['leader'];
+         $week                    = $pe_arr['week'];
+         if($participant_fullname == '') {
+             // No participant assigned to this slot yet
+@@ -30,7 +40,6 @@
+         <td><?php echo $participant_fullname; ?></td>
+         <td><?php echo $participant_age; ?></td>
+         <td><?php echo $login_fullname; ?></td>
+-        <td><?php echo $leader; ?></td>
+         <td><?php echo $week; ?></td>
+         </tr>
+     <?php } ?>
+Only in ../templates/: templates.diff
+diff -u ../templates//user_student_nav.php ../../../schedule/includes/templates//user_student_nav.php
+--- ../templates//user_student_nav.php	2014-06-24 00:22:13.000000000 -0500
++++ ../../../schedule/includes/templates//user_student_nav.php	2014-06-26 18:40:14.000000000 -0500
+copy from schedule
+@@ -15,6 +15,7 @@
+             </select>
+             <input class="classLoadButton" type="button" id="get_events_by_type" value="Go">
+         </form>
++<!--
+         <div class="instructions color_key">
+             <h3><?php echo $sl->gp('Color Key'); ?></h3>
+             <table style="width: 78%;">
+@@ -22,6 +23,7 @@
+             <td class="paid"><?php echo $sl->gp('Paid'); ?></td>
+             <td class="unpaid"><?php echo $sl->gp('Unpaid'); ?></td></tr></table>
+         </div>
++-->
+     </div>
+     <div id="dayFilter">
+         <form id="dayFilterForm" name="dayFilterForm">
+@@ -33,6 +35,7 @@
+             </select>
+             <input class="classLoadButton" type="button" id="get_events_by_day" value="Go">
+         </form>
++<!--
+         <div class="instructions color_key">
+             <h3>Color Key</h3>
+             <table style="width: 78%;">
+@@ -40,6 +43,7 @@
+             <td class="confirmed"><?php echo $sl->gp('Confirmed'); ?></td>
+             <td class="unconfirmed"><?php echo $sl->gp('On Hold'); ?></td></tr></table>
+         </div>
++-->
+     </div>
+     <div id="participantFilter">
+         <h3>Start typing the student's name and then select from the list that appears.</h3>
+@@ -50,6 +54,7 @@
+             <input type="text" name="participant" id="participant">
+             <input type="hidden" name="participant_id" id="participant_id" value=""> 
+         </form>
++<!--
+         <div class="instructions color_key">
+             <h3>Color Key</h3>
+             <table style="width: 78%;">
+@@ -57,6 +62,7 @@
+             <td class="confirmed"><?php echo $sl->gp('Confirmed'); ?></td>
+             <td class="unconfirmed"><?php echo $sl->gp('On Hold'); ?></td></tr></table>
+         </div>
++-->
+     </div>
+     <div id="logIn">
+         <div id="login_holder">
+Only in ../../../schedule/includes/templates/: vit_billing_line_item.php
