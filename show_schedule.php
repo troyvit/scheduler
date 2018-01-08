@@ -163,6 +163,7 @@ var modalActivator = {
                     });
                 });
                 $('.classManipulatorButton').click(function(e) {
+                    alert('you hit the right button');
                     $('#action').val(this.id); // I keep wanting to say how I hate this
                     // Thanks Past-Troy. I hate trying to track down wtf is going on when I need to figure it out.
                     // That's ok past-future-troy, I'm getting quicker at it. This time it was only 4 minutes or so
@@ -180,12 +181,13 @@ var modalActivator = {
                     
                     // debug // 
                     var tosend=$('#classManipulator').serialize();
-                    console.log(this.id);
+                    console.log('id is '+this.id);
                     if(this.id == 'add_private_event') {
                         if($('#private_participant').val().length==0) {
                             alert('adding with no participant');
                         }
                     }
+                    console.log('we are about to say what we are gonna send');
                     console.log(tosend);
                     $.ajax({
                         url: "includes/rpc.php",

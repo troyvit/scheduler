@@ -23,6 +23,11 @@ require('language.php');
 
 // how to use echo $ph_arr['color key']['phrase'];
 
+$config = new config;
+$config -> db = $db;
+
+$myconfig = $config -> my_config();
+
 $s_Login = new s_Login;
 $s_Login -> db = $db;
 $s_Login -> log_level=false;
@@ -71,6 +76,19 @@ if(strlen($_SESSION['login_hash']) > 0) {
 } else {
     // user is not logged in
     $_SESSION['log_level']=0;
+}
+
+if(ca($action) == 'config') {
+    $s_class = new S_class(18);
+    $s_class -> db = $db;
+
+    $config = new config;
+    $config -> db = $db; # god i need to fix this
+
+    $arr = $s_class -> test_func();
+    echo '<pre>';
+    print_r($arr);
+    echo "that was that \n";
 }
 
 // to test add an $action
@@ -3334,7 +3352,7 @@ if(ca($action) == 'get_modal') {
     $s_event -> db = $db;
 
     $event_result = $s_event -> get_all_event_types();
-    $event_list = result_as_html_list(new html_Render(), $event_result, 'id', 'event', '');
+    $event_list = result_as_html_list(new html_Render(), $event_result, 'id', 'event', ''); // worst idea ever
 
     $class_id      = $_REQUEST['class_id'];
     if($class_id*1 == 0) {
@@ -3415,31 +3433,86 @@ if(ca($action) == 'add_class') {
 
     // action=add_class&class_id=1&event_id=&date_time=2012-09-04_2_08%3A30%3A00&event_type=1&location=1&duration=20&occurance_rate=weekly&number_participants=2&leader=2
 
+    // action=add_class&event_id=&class_id=18&event_type=23&private_start=2018-01-01&private_end=2018-01-29&private_participant=Dakota+Casey&private_participant_id=4184&location_id=1&duration=10&occurance_rate=daily&selected_days%5B1%5D=1&selected_days%5B2%5D=2&selected_days%5B3%5D=3&selected_days%5B4%5D=4&number_participants=1&leader_id=1&edt_meta=test&edt_id=
+
     // prepare the date and time
     // $da=explode('_', urldecode($_REQUEST['date_time']));
     // print_r($da);
-    $data['timestamp']=$_REQUEST['date_time'];
-    $data['date']=$da[0];
-    $data['day_number']=$da[1];
-    $data['event_time']=$da[2];
-    $data['class_id']=$_REQUEST['class_id'];
-    $data['location_id']=$_REQUEST['location_id'];
-    $data['occurance_rate']=$_REQUEST['occurance_rate'];
-    $data['number_participants']=$_REQUEST['number_participants'];
-    $data['leader_id']=$_REQUEST['leader_id'];
-    $data['duration']=$_REQUEST['duration'];
-    $data['et_id']=$_REQUEST['event_type'];
+    $data['timestamp']              = $_REQUEST['date_time'];
+    $data['date']                   = $da[0];
+    $data['day_number']             = $da[1];
+    $data['event_time']             = $da[2]; // wtf is this.
+    $data['class_id']               = $_REQUEST['class_id'];
+    $data['location_id']            = $_REQUEST['location_id'];
+    $data['occurance_rate']         = $_REQUEST['occurance_rate'];
+    $data['number_participants']    = $_REQUEST['number_participants'];
+    $data['leader_id']              = $_REQUEST['leader_id'];
+    $data['duration']               = $_REQUEST['duration'];
+    $data['et_id']                  = $_REQUEST['event_type'];
+    $data['start']                  = $_REQUEST['private_start'];
+    $data['end']                    = $_REQUEST['private_end'];
+    $data['private_participant_id'] = $_REQUEST['private_participant_id'];
+
+    echo '<pre>';
+    print_r($data);
+
+
     $s_class = new S_class($data['class_id']);
     $s_class -> db = $db;
 
-    $result = $s_class->get_class($id);
-    $class_row = $result->fetch_assoc();
-    $data['start']=$class_row['start'];
 
-    $result = $s_class -> add_class_events($data);
-    // changed because now I want to return the event_id
-    if($result!==false) {
-        echo 'true';
+    $s_event = new S_event;
+    $s_event -> db = $db;
+
+    // find out if this is a private class
+    $et_res = $s_event->get_event_type_by_id($data['et_id']);
+    $et_arr = $et_res -> fetch_assoc();
+    $et_activity_level = $et_arr['et_activity_level'];
+
+    if($et_activity_level == 2) { // private class
+        // yay
+        $data['class_id']  = 0; // all privates get a class_id of 0
+    } else {
+        $result = $s_class->get_class($id);
+        $class_row = $result->fetch_assoc();
+        $data['start']  = $class_row['start'];
+        unset($data['end']);
+        unset($data['private_participant_id']); 
+    }
+
+    $event_id = $s_class -> add_class_events($data);
+    if($event_id !== false) {
+        // whew
+        if($et_activity_level == 2) {
+            // insert the event_participant
+            // keeping these guys here for now. hope I don't regret it
+            $s_participant = new S_participant;
+            $s_participant -> db = $db;
+
+            $s_billing = new S_billing;
+            $s_billing -> db = $db;
+
+            $participant_id  = $data['private_participant_id'];
+            $event_line_item_id=1; // going to have to do something about this
+
+            $event_res = $s_event -> better_get_event($event_id);
+            $event_data = $event_res->fetch_assoc();
+            $event_line_item   = $event_data['et_name'];
+            $et_code           = $event_data['et_code'];
+            $event_line_item = "Private: ".$event_data['et_name'].", participant: $participant_id";
+
+            $event_prices = json_decode($myconfig['private_price']['option_value'], true);
+            $amount_due = $event_prices[$et_code];
+
+            $ep_id = $s_participant -> insert_event_participant($event_id, $participant_id);
+            $tf = $s_billing -> insert_event_billing ($event_line_item_id, $event_line_item, $participant_id, $ep_id, $amount_due, 0, '');
+            if($tf==true) {
+                $json_arr=array("status"=>"success","event_id"=>$event_id);
+                $json=json_encode($json_arr);
+                echo $json;
+            }
+        }
+        echo 'true'; // optimist
     }
 }
 

@@ -57,7 +57,7 @@ $day_list = array (0=>'Sunday', 1=>'Monday', 2=>'Tuesday', 3=>'Wednesday', 4=>'T
 
 // default list of days selected
 // $default_selected_privates=array(1,2,3,4,5);
-$default_selected_privates=array(1,2,3,4);
+$default_selected_privates = array(1,2,3,4);
 
 $has_config=true;
 
@@ -70,7 +70,7 @@ $default_class_id=18; // fall 2017
 // login defaults
 // $logout_hours = 24; // after 24 hours you are logged out
 
-$logout_params = array('time'=>'minute', 'increment'=>60);
+$logout_params = array('time'=>'minute', 'increment'=>120);
 
 // just stuff
 $age_month_cutoff=36; // cutoff betweenshowing months and years for age.
@@ -109,6 +109,10 @@ $lang='en';
 // $price['group']=546;
 // $price['group']=286;
 $price['group']=66;
+
+$price['SWM'] = 650; // in db
+$price['FLT'] = 430; // in db
+$price['SFS'] = 650; // in db
 
 $registration['orig']=0; // cost for registration for first child
 $registration['sibling']=0; // cost for registration for second child

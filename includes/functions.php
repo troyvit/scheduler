@@ -376,25 +376,33 @@ class S_class {
     }
 
     function add_class_events($data) {
-        // debug // 
-        print_r($data);
+        // why the shit is this in class and not event?
+        // I bet I called it add_class_events instead of add_events to try to feel 
+        // less stupid about doing that
+        // debug // print_r($data);
         extract($data);
-        echo "we are on line ".__LINE__." NOW \n";
+        // debug // echo "we are on line ".__LINE__." NOW \n";
         /* 
          * get the start date from the class id
          *
          */
         // echo "timestamp is $timestamp \n";
         $event_date=date('Y-m-d', $timestamp);
+        $num_day_of_week = date('w', $timestamp);
         echo "event_date is $event_date and start is $start \n";
         if($event_date < $start) {
             // encountered a bug where the event date didn't make it to the function. punt.
             return false;
         }
         // debug // echo "event date is $event_date and end_date is $end_date <br>";
-        $result=$this->get_class();
-        $row = $result->fetch_assoc();
-        $end_date=$row['end'];
+        if($end == '') {
+            // no end date. must be a group class
+            $result=$this->get_class();
+            $row = $result->fetch_assoc();
+            $end_date=$row['end'];
+        } else {
+            $end_date=$data['end'];
+        }
         // insert into the main events table
         $ta=explode('-', $event_date);
         $current_day_number=$ta[2];
@@ -411,14 +419,24 @@ class S_class {
         $e_datetime=$event_date.' '.$event_time;
         // echo "e_datetime is $e_datetime <br>";
         // I'm glad I don't pull class_id from the object because I sometimes need a different class id
-        echo "so everything should be ok here fo rthe insert into event \n";
+        echo "so everything should be ok here for the insert into event \n";
         $ins='INSERT INTO event(class_id, location_id, leader_id, number_participants, et_id, duration)
                 VALUES ('.$class_id.', '.$location_id.', '.$leader_id.', '.$number_participants.', '.$et_id.', '.$duration.')';
         // debug // echo $ins."\n"; echo "and that was the insert into event \n"; die();
         $result = $this->db->query($ins);
         $event_id=$this->db->insert_id;
+        echo "working with $event_id <br>";
         while($event_date < $end_date) {
+            $toinsert = true;
             $inc_num=$this->increment_number($occurance_rate);
+            if($inc_num == 1) {
+                // daily class, assume it's a private
+                $dsp_arr = config::config_option('default_selected_privates');
+                $default_selected_privates = json_decode($dsp_arr['option_value']);
+                if(!in_array($num_day_of_week, $default_selected_privates)) {
+                    $toinsert = false;
+                }
+            }
             // do all your date shit here
             // '9999-12-31 23:59:59' 
             $ta=explode('-', $event_date);
@@ -429,7 +447,9 @@ class S_class {
             $ins='INSERT INTO event_daytime(event_id, daytime)
                 VALUES ('.$event_id.', "'.$e_datetime.'")';
             // debug // echo $ins."\n";
-            $result = $this->db->query($ins);
+            if($toinsert === true) {
+                $result = $this->db->query($ins);
+            }
             $event_date=date('Y-m-d', mktime(0,0,0,$this_month, $current_day_number+$inc_num, $this_year));
         }
         // full of confidence
@@ -437,8 +457,20 @@ class S_class {
         return $event_id;
     }
 
+    function test_func() {
+        // test getting all config options from another class
+        /*
+        $config_stuff = config::my_config();
+        return $config_stuff;
+         */
+
+        $val = config::config_option('default_selected_privates');
+        return $val;
+    }
+
     function increment_number($occurance_rate) {
         // maybe this needs to be in config
+        // yeah like the new config table I just built
         $day_inc=array('daily'=>1,'weekly'=>7,'every other day'=>2);
         return $day_inc[$occurance_rate];
     }
@@ -603,7 +635,7 @@ class S_event {
     function better_get_event($event_id) {
         
 
-        $query='select event_type.et_name as et_name, 
+        $query='select event_type.et_name as et_name, event_type.et_code as et_code,
            DAYNAME(min(event_daytime.daytime)) 
             AS event_day, 
             DATE_FORMAT(min(event_daytime.daytime), "%l:%i %p") as event_time,
@@ -798,8 +830,14 @@ class S_event {
         $this->location_id=$location_id;
     }
     
-    function get_all_event_types() {
-        $query='SELECT id, et_code, if(et_desc !="", concat(et_name, " (", et_desc, ")"), et_name) as event from event_type where activity_level=1 order by event';
+    function get_all_event_types($et_activity_level='') {
+        if(strlen($et_activity_level) > 0) {
+            $clause = ' WHERE et_activity_level = '.$et_activity_level.' ';
+        } else {
+            $clause = ' WHERE et_activity_level > 0 ';
+        }
+        $query='SELECT id, et_code, et_activity_level, if(et_desc !="", concat(et_name, " (", et_desc, ")"), et_name) as event from event_type '.$clause.' order by et_name';
+        // debug // echo $query."<br>";
         if ($result = $this->db->query($query)) {
             return $result;
         }
@@ -2548,6 +2586,31 @@ class S_leader {
     }
 }
 
+class config  {
+    var $db;
+    function my_config() {
+        $query = 'SELECT * FROM config';
+        if ($result = $this->db->query($query)) {
+            while($arr = $result -> fetch_assoc()) {
+                extract($arr);
+                $ret[$option_name]=$arr;
+            }
+        }
+        return $ret;
+    }
+
+    function config_option ($option_name) {
+        $query = 'SELECT * FROM config WHERE option_name="'.$option_name.'"';
+        // debug // echo $query."<br>";
+        if ($result = $this->db->query($query)) {
+            $arr = $result -> fetch_assoc();
+            return $arr;
+        }
+        return false; // yeah this isn't how we do the other sql queries but guess what WE DO THOSE WRONG.
+    }
+
+}
+
 function result_as_json($result) {
     // you need to get this into your class
     // I'm going to regret this
@@ -2838,8 +2901,5 @@ function is_required( $id ) {
     } 
     // validarium return 'data-rules-required="true"';
     return 'required';
-}
-
-function get_age($year) {
 }
 ?>
