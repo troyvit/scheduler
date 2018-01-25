@@ -402,6 +402,7 @@ class S_class {
             $end_date=$row['end'];
         } else {
             $end_date=$data['end'];
+            $event_date = $start;
         }
         // insert into the main events table
         $ta=explode('-', $event_date);
@@ -426,14 +427,17 @@ class S_class {
         $result = $this->db->query($ins);
         $event_id=$this->db->insert_id;
         echo "working with $event_id <br>";
-        while($event_date < $end_date) {
+        while($event_date <= $end_date) {
             $toinsert = true;
             $inc_num=$this->increment_number($occurance_rate);
             if($inc_num == 1) {
                 // daily class, assume it's a private
                 $dsp_arr = config::config_option('default_selected_privates');
                 $default_selected_privates = json_decode($dsp_arr['option_value']);
+                print_r($default_selected_privates);
+                echo "num_day_of_week is $num_day_of_week \n";
                 if(!in_array($num_day_of_week, $default_selected_privates)) {
+                    echo "toinsert is false\n";
                     $toinsert = false;
                 }
             }
@@ -446,11 +450,13 @@ class S_class {
             $e_datetime=$event_date.' '.$event_time;
             $ins='INSERT INTO event_daytime(event_id, daytime)
                 VALUES ('.$event_id.', "'.$e_datetime.'")';
-            // debug // echo $ins."\n";
             if($toinsert === true) {
+                // debug // 
+                echo $ins."\n";
                 $result = $this->db->query($ins);
             }
-            $event_date=date('Y-m-d', mktime(0,0,0,$this_month, $current_day_number+$inc_num, $this_year));
+            $event_date      = date('Y-m-d', mktime(0,0,0,$this_month, $current_day_number+$inc_num, $this_year));
+            $num_day_of_week = date('w', mktime(0,0,0,$this_month, $current_day_number+$inc_num, $this_year));
         }
         // full of confidence
         // misplaced it turns out

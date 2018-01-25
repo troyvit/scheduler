@@ -163,7 +163,6 @@ var modalActivator = {
                     });
                 });
                 $('.classManipulatorButton').click(function(e) {
-                    alert('you hit the right button');
                     $('#action').val(this.id); // I keep wanting to say how I hate this
                     // Thanks Past-Troy. I hate trying to track down wtf is going on when I need to figure it out.
                     // That's ok past-future-troy, I'm getting quicker at it. This time it was only 4 minutes or so
