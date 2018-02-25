@@ -109,6 +109,12 @@ td.daily_event, td.daily_location, td.daily_leader {
 }
 */
 
+.edit_edt_meta {
+    width: 180px;
+    height: 90px;
+    display: none;
+}
+
 td.daily_box { width: 114px; border-right: 1px solid #000000; }
 
 td.daily_pname, td.daily_page, td.daily_leader, td.daily_login, td.daily_week {

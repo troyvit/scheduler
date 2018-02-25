@@ -513,6 +513,7 @@ class S_class {
     function get_all_events_by_day($day)  {
         // consider making one of these that doesn't depend on class_id
         $query = 'SELECT event.*, event_daytime.*, 
+            event_daytime.id as edt_id,
             DAYNAME(event_daytime.daytime) AS event_day,
             DATE_FORMAT(event_daytime.daytime, "%l:%i %p") as event_time
             FROM event, event_daytime 
@@ -897,7 +898,8 @@ class S_event {
         $query='UPDATE event_daytime
             SET edt_meta="'.$edt_meta.'"
             WHERE id='.$edt_id;
-        // debug // echo $query.'<br>';
+        // debug // 
+        echo $query.'<br>';
         if ($result = $this->db->query($query)) {
             return $result;
         } else {

@@ -12,6 +12,7 @@ require ('includes/head_include.php'); ?>
 #hold_daily_schedule select { display: none; }
 </style>
 
+<script type="text/javascript" src="js/svg-injector.min.js"></script>
 <script type="text/javascript" src="js/reveal/jquery.reveal.js"></script>
 
 <script type="text/javascript" src="./js/clipboard.min.js"> </script> <!-- clibpord js thing -->
@@ -71,38 +72,49 @@ var dailySchedule = {
                     var leader_id = $('#filter_leader').val();
                     dailySchedule.showDaily(dailySchedule.day, leader_id);
                 });
-                $('.ped_meta').click(function(e) { // this shit ... not even used. it talks to classes on another friggen screen.
-                    /*
-                    console.log(this.id);
-                    var ped_meta_arr=this.id.split('_');
-                    var ped_id = ped_meta_arr[2];
-                    console.log(ped_id);
-                    var to_hide='#ped_meta_show_'+ped_id;
-                    var to_show = '#edit_ped_meta_container_'+ped_id;
+                $('.edt_meta').click(function(e) { 
+                    console.log('clicked on '+this.id);
+                    var edt_meta_arr=this.id.split('_');
+                    var edt_id = edt_meta_arr[2];
+                    console.log(edt_id);
+                    var to_hide='#edt_show_'+edt_id;
+                    var to_show = '#edt_edit_'+edt_id;
+                    console.log('showing '+to_show+' and hiding '+to_hide);
                     $(to_show).show();
                     $(to_hide).hide();
-                    $('.edit_ped_meta').blur(function(e) {
-                        var ped_meta_arr=this.id.split('_');
-                        var ped_meta = $('#edit_ped_meta_'+ped_id).val();
-                        console.log('we are updating for '+ped_id);
+                    $('#edt_edit_text_'+edt_id).blur(function(e) {
+                        var edt_meta_arr=this.id.split('_');
+                        var edt_meta = $('#edt_edit_text_'+edt_id).val();
+                        console.log('we are updating for '+edt_id);
                         // ajax call here
-                        console.log('ped_meta is '+ped_meta);
+                        console.log('edt_meta is '+edt_meta);
                         $.ajax({
                             url: "includes/rpc.php",
                             type: "POST",
-                            data: 'action=update_ped_meta&ped_meta='+ped_meta+'&ped_id='+ped_id,
+                            data: 'action=update_edt_meta&edt_meta='+edt_meta+'&edt_id='+edt_id,
                             dataType: "json",
                             success: function(result) {
                                 // hide the text box and show the text
                                 console.log('and we are returned ');
-                                console.log(result.ped_meta);
-                                $('#ped_meta_show_'+ped_id).html(result.ped_meta);
+                                // success, make sure what was saved is what was shown
+                                // yeah turning over a new leaf
+                                $.ajax({
+                                    url: "includes/rpc.php",
+                                    type: "POST",
+                                    data: 'action=get_edt_meta&&edt_id='+edt_id,
+                                    dataType: "json",
+                                    success: function(result) {
+                                        alert(to_show);
+                                    }
+                                });
+                                /*
+                                $('#edt_meta_show_'+edt_id).html(result.edt_meta);
                                 $(to_hide).show();
                                 $(to_show).hide();
+                                 */
                             }
                         });
                     });
-                    */
                 });
 
             }
