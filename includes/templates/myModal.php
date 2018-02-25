@@ -5,6 +5,7 @@
         <h1 id="className"></h1>
         <input type="hidden" id="action" name="action" value="">
         <input type="hidden" id="eventId" name="event_id" value="<?php echo $event_id; ?>">
+        <input type="hidden" id="et_activity_level " name="et_activity_level" value="<?php echo $et_activity_level ; ?>">
         <table class="class_edit">
             <tr><td colspan="2" style="text-align: center; font-weight: bold; "><?php echo $event_day; ?></td></tr>
             <tr><td colspan="2" style="text-align: center; font-weight: bold; "><?php echo $event_time; ?></td></tr>

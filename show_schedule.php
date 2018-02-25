@@ -284,7 +284,7 @@ $(document).ready(function() {
                     if(private_classes==true) {
                         modalActivator.participant_search=true;
                         var private_start =  $('#week_start').val();
-                        var private_end   =  $('#week_end').val();
+                        // not sure why this is here // var private_end   =  $('#week_end').val();
                         modalData=modalData+"&private_classes=true&private_start="+private_start+"&private_end="+private_end;
                         participantData.participantSearchFieldLocation='private_participant';
 

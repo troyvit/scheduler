@@ -381,38 +381,32 @@ class S_class {
         // less stupid about doing that
         // debug // print_r($data);
         extract($data);
-        // debug // echo "we are on line ".__LINE__." NOW \n";
         /* 
          * get the start date from the class id
          *
          */
         // echo "timestamp is $timestamp \n";
-        $event_date=date('Y-m-d', $timestamp);
+        $event_date = date('Y-m-d', $timestamp);
+        $event_time = date('H:i:s', $timestamp);
         $num_day_of_week = date('w', $timestamp);
-        echo "event_date is $event_date and start is $start \n";
-        if($event_date < $start) {
-            // encountered a bug where the event date didn't make it to the function. punt.
-            return false;
-        }
         // debug // echo "event date is $event_date and end_date is $end_date <br>";
         if($end == '') {
             // no end date. must be a group class
+            // getting the end date from the class instead of any input
             $result=$this->get_class();
             $row = $result->fetch_assoc();
             $end_date=$row['end'];
+            $start_date=$row['start'];
         } else {
+            $start_date=$data['start'];
             $end_date=$data['end'];
             $event_date = $start;
         }
         // insert into the main events table
-        $ta=explode('-', $event_date);
-        $current_day_number=$ta[2];
         $current_day_number=date('j', $timestamp);
         // debug // echo "current_day_number is now $current_day_number <br>";
-        $this_year=$ta[0];
         $this_year = date('Y', $timestamp);
         // deduecho "this_year is now $this_year <br>";
-        $this_month=$ta[1];
         $this_month = date('n', $timestamp);
         // echo "this_month is now $this_month <br>";
         $event_time= date('H:i', $timestamp);
@@ -421,11 +415,13 @@ class S_class {
         // echo "e_datetime is $e_datetime <br>";
         // I'm glad I don't pull class_id from the object because I sometimes need a different class id
         echo "so everything should be ok here for the insert into event \n";
-        $ins='INSERT INTO event(class_id, location_id, leader_id, number_participants, et_id, duration)
-                VALUES ('.$class_id.', '.$location_id.', '.$leader_id.', '.$number_participants.', '.$et_id.', '.$duration.')';
-        // debug // echo $ins."\n"; echo "and that was the insert into event \n"; die();
+        $ins='INSERT INTO event(class_id, start, end, location_id, leader_id, number_participants, et_id, duration)
+                VALUES ('.$class_id.', "'.$start_date.'", "'.$end_date.'", '.$location_id.', '.$leader_id.', '.$number_participants.', '.$et_id.', '.$duration.')';
+        // debug // 
+        echo $ins."\n"; echo "and that was the insert into event \n"; // die();
         $result = $this->db->query($ins);
         $event_id=$this->db->insert_id;
+        echo "event id is $event_id \n";
         echo "working with $event_id <br>";
         while($event_date <= $end_date) {
             $toinsert = true;
@@ -521,9 +517,9 @@ class S_class {
             DATE_FORMAT(event_daytime.daytime, "%l:%i %p") as event_time
             FROM event, event_daytime 
             WHERE event_daytime.daytime like "'.$day.'%" 
-            AND event_daytime.event_id=event.id and event.class_id='.$this->class_id.'
+            AND event_daytime.event_id=event.id and event.class_id in (0, '.$this->class_id.')
             ORDER BY event_daytime.daytime';
-        // debug // echo $query;
+        // debug // echo $query; die();
 
         if ($result = $this->db->query($query)) {
             return $result;
@@ -625,7 +621,7 @@ class S_event {
 
     function get_event($event_id) {
         $query='SELECT 
-            event.id as event_id, event.class_id, event.location_id, event.leader_id, event.number_participants, event.et_id, event.duration, DAYNAME(min(event_daytime.daytime)) 
+            event.id as event_id, event.start as start, event.end as end, event.et_id as et_id, event.class_id, event.location_id, event.leader_id, event.number_participants, event.et_id, event.duration, DAYNAME(min(event_daytime.daytime)) 
             AS event_day, 
             DATE_FORMAT(min(event_daytime.daytime), "%l:%i %p") as event_time
             FROM event LEFT JOIN event_daytime on event.id=event_daytime.event_id 
@@ -2908,4 +2904,14 @@ function is_required( $id ) {
     // validarium return 'data-rules-required="true"';
     return 'required';
 }
+
+function datediffInWeeks($date1, $date2) {
+    if($date1 > $date2) return datediffInWeeks($date2, $date1);
+    $first = DateTime::createFromFormat('Y-m-d H:i:s', $date1);
+    $second = DateTime::createFromFormat('Y-m-d H:i:s', $date2);
+    $ret['days']  = $first->diff($second)->days;
+    $ret['weeks'] = ceil($first->diff($second)->days/7);
+    return $ret['weeks'];
+}
+
 ?>

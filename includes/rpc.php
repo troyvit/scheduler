@@ -1875,6 +1875,8 @@ if(ca($action) == 'daily_schedule') {
     $s_login_reg = new S_login_reg;
     $s_login_reg -> db = $db; # god i need to fix this
 
+    $now = date('Y-m-d H:i:s'); // used to calculate week number of provate classes
+
     // get all leaders so we can filter
     $leader_result = $s_class -> get_all_leaders();
     while($la =$leader_result -> fetch_assoc()) {
@@ -1906,7 +1908,10 @@ if(ca($action) == 'daily_schedule') {
             $students=""; // reset this var so we can make a list of students
             $show_event    = true;
             $id            = $ga['id'];
+            $class_id      = $ga['class_id']; // class_id of 0 means it's a private class
             $event_id      = $ga['event_id'];
+            $start         = $ga['start']; // start and end are for privates only
+            $end           = $ga['end']; // start and end are for privates only
             $et_id         = $ga['et_id'];
             $edt_meta      = $ga['edt_meta'];
             // get the event type
@@ -1934,158 +1939,80 @@ if(ca($action) == 'daily_schedule') {
             $ep_res = $s_participant -> participants_in_event($event_id);
             $ep_arr=result_as_array(new serialized_Render(), $ep_res, 'participant_id');
             // debug // echo '<pre>'; print_r($ep_arr); echo '</pre>';
-            foreach($ep_arr as $ep_id => $epa) {
-                // print_r($epa);
-                $participant_id = $epa['participant_id'];
-                $name = $epa['fname'].' '.$epa['lname'];
-                $age = ceil($epa['participant_age_months']/12);
-                // get parents
-                $part_login_res = $s_participant -> get_logins_by_participant($participant_id);
-                $login_data = $part_login_res ->fetch_assoc();
-                $login_fullname = $login_data['fname'].' '.$login_data['lname'];
-                $login_email = $login_data['email'];
-                $login_id = $login_data['id'];
-                if($login_id != '') {
-                    $address_res    = $s_login_reg -> address_by_login_type($login_id, 1);
-                    $address_info   = $address_res -> fetch_assoc();
-                    $phone_h        = $address_info['phone_h'];
-                    $phone_w        = $address_info['phone_w'];
-                    $phone_c        = $address_info['phone_c'];
-                } else {
-                    $login_fullname='Unknown parent';
-                }
-                // $students.="$name, $age<br>";
-                $students[$id] .= "<div class='daily_schedule_participant'>$name</div>
+            if(is_array($ep_arr)) {
+                // new classes have 0 students but still take up space in the sched
+                foreach($ep_arr as $ep_id => $epa) {
+                    // print_r($epa);
+                    $participant_id = $epa['participant_id'];
+                    $name = $epa['fname'].' '.$epa['lname'];
+                    $age = ceil($epa['participant_age_months']/12);
+                    // get parents
+                    $part_login_res = $s_participant -> get_logins_by_participant($participant_id);
+                    $login_data = $part_login_res ->fetch_assoc();
+                    $login_fullname = $login_data['fname'].' '.$login_data['lname'];
+                    $login_email = $login_data['email'];
+                    $login_id = $login_data['id'];
+                    if($login_id != '') {
+                        $address_res    = $s_login_reg -> address_by_login_type($login_id, 1);
+                        $address_info   = $address_res -> fetch_assoc();
+                        $phone_h        = $address_info['phone_h'];
+                        $phone_w        = $address_info['phone_w'];
+                        $phone_c        = $address_info['phone_c'];
+                    } else {
+                        $login_fullname='Unknown parent';
+                    }
+                    // $students.="$name, $age<br>";
+                    $students[$id] .= "<div class='daily_schedule_participant'>$name</div>
 
-        <div class='daily_schedule_login'>
-            <a href='mailto:$login_email'>$login_fullname<a/>
-            <br>h: $phone_h
-            <br>w: $phone_w
-            <br>c: $phone_c
-        </div>";
+            <div class='daily_schedule_login'>
+                <a href='mailto:$login_email'>$login_fullname<a/>
+                <br>h: $phone_h
+                <br>w: $phone_w
+                <br>c: $phone_c
+            </div>";
+                }
             }
             // echo '<pre>'; print_r($students); echo '</pre>';
 
             if($show_event == true) {
+                if($class_id == 0) {
+                    // private class
+                    // find out what week we're in
+                    // debug // echo "the start is $start and now is $now for $event_id<br>";
+                    $week_no = datediffInWeeks($start, $now);
+                    if($week_no == 0) {
+                        // day 1 of the class I guess?
+                        $week_no = 1;
+                    }
+                } else {
+                    $week_no = "N/A";
+                }
                 $rowcount[$twentyfour_hour][$minutes]++;
                 $day_arr[$twentyfour_hour][$minutes]['group'][$id]=array(
-                    'id'=>$id,
-                    'students'=>$students[$id],
-                    'event_id'=>$event_id,
-                    'type' => 'group',
-                    'location_id'=>$location_id,
-                    'location'=>$location,
-                    'leader_id'=>$leader_id,
-                    'et_name'=>$et_name,
-                    'et_desc'=>" $et_desc",
-                    'leader'=>$leader,
-                    'event_day'=>$event_day,
-                    'daytime'=>$daytime,
-                    'event_day_arr'=>$event_day_arr,
-                    'edt_meta'=>$edt_meta,
+                    'class_id'      => $class_id,
+                    'start'         => $start,
+                    'end'           => $end,
+                    'week_no'       => $week_no,
+                    'id'            => $id,
+                    'students'      => $students[$id],
+                    'event_id'      => $event_id,
+                    'location_id'   => $location_id,
+                    'location'      => $location,
+                    'leader_id'     => $leader_id,
+                    'et_name'       => $et_name,
+                    'et_desc'       => " $et_desc",
+                    'leader'        => $leader,
+                    'event_day'     => $event_day,
+                    'daytime'       => $daytime,
+                    'event_day_arr' => $event_day_arr,
+                    'edt_meta'      => $edt_meta,
                 );
                 // $n_rowspan[$twentyfour_hour][$minutes] += count($day_arr[$twentyfour_hour][$minutes]['group']);
             }
         }
     }
 
-    $priv_res = $s_private -> get_private_events_from_start($day, 1);
-    if($priv_res -> num_rows > 0) {
-        $priv_arr=result_as_array(new serialized_Render(), $priv_res, 'id');
-    }
-    // debug // echo '<pre>'; print_r($priv_arr); echo '</pre>';
-    if(is_array($priv_arr)) {
-        foreach($priv_arr as $pa) {
-            $show_event    = true;
-            $id            = $pa['id'];
-            $ped_id        = $pa['ped_id'];
-            $location_id   = $pa['location_id'];
-            $location      = $pa['location'];
-            $leader_id     = $pa['leader_id'];
-            $leader        = $pa['leader'];
-            $daytime       = $pa['daytime'];
-            $event_day_arr = date_parse ( $daytime );
-            // $hour = $event_day_arr['hour'];
-            // echo "for $daytime we have: ";
-            // print_r($event_day_arr);
-            $standard_hour          = date("g", strtotime($daytime));
-            $twentyfour_hour        = date("G", strtotime($daytime));
-            $minutes                = date("i", strtotime($daytime));
-            $daytime                = $pa['daytime'];
-            $fullname               = $pa['participant_fullname'];
-            $dob                    = $pa['dob'];
-            $participant_id         = $pa['participant_id'];
-            $days_different         = $pa['days_different'];
-            $ped_meta               = $pa['ped_meta'];
-            $week                   = ceil($days_different/7);
-            if($week == 0) {
-                // this is the same day as the first class
-                // echo "changed week to 1 for $fullname - $ped_id - $id <br>";
-                $week = 1;
-            }
-            // get login info from the participant
-            $participant_age_months = $pa['participant_age_months'];
-            if($participant_id*1 > 0) {
-                $login_res      = $s_participant -> get_logins_by_participant($participant_id);
-                $login_arr      = $login_res -> fetch_assoc();
-                // debug // print_r($login_arr);
-                $login_fullname = $login_arr['fname'].' '.$login_arr['lname'];
-                $login_email    = $login_arr['email'];
-                $login_id       = $login_arr['id'];
-                // get the mom's login address / phone info
-                $address_res    = $s_login_reg -> address_by_login_type($login_id, 1);
-                $address_info   = $address_res -> fetch_assoc();
-                $phone_h        = $address_info['phone_h'];
-                $phone_w        = $address_info['phone_w'];
-                $phone_c        = $address_info['phone_c'];
-            } else {
-                $login_fullname = 'Missing Student';
-            }
-            // echo $login_fullname.'<br>';
-            if(strlen($leader_toshow) > 0) {
-                if($leader_toshow != $leader_id) {
-                    $show_event = false;
-                }
-            } else {
-                $rowcount[$twentyfour_hour][$minutes]++;
-            }
-            if($show_event == true) {
-                $day_arr[$twentyfour_hour][$minutes]['private'][$id]=array(
-                    'id'=>$id,
-                    'event_id'=>$event_id,
-                    'ped_id'=>$ped_id,
-                    'ped_meta'=>$ped_meta,
-                    'type' => 'private',
-                    'location_id'=>$location_id,
-                    'location'=>$location,
-                    'leader_id'=>$leader_id,
-                    'leader'=>$leader,
-                    'event_day'=>$event_day,
-                    'daytime'=>$daytime,
-                    'fullname'=>$fullname,
-                    'login_fullname'=>$login_fullname,
-                    'phone_h'   =>$phone_h,
-                    'phone_w'   =>$phone_w,
-                    'phone_c'   =>$phone_c,
-                    'dob'=>$dob,
-                    'age'=>$participant_age_months,
-                    'event_day_arr'=>$event_day_arr,
-                );
-                // $n_rowspan[$twentyfour_hour][$minutes] += count($day_arr[$twentyfour_hour][$minutes]['private']);
-            }
-        }
-    }
-
-
-    /*
-    echo '<pre>';
-    print_r($rowcount);
-    echo '</pre>';
-    */
-
-    // works! // 
-    // debug // echo '<pre>'; print_r($day_arr);
-    // wow past troy you are a trip
+    // echo '<pre>'; print_r($day_arr); die();
 
     // split the table up by hour based on the existing time constraint
     $rowspan            = 60/$daily_schedule_time_constraint;
@@ -2139,6 +2066,8 @@ if(ca($action) == 'daily_schedule') {
          * yet when I remove it all hell breaks loose
          *
          * OK well I have it looking much better but when you filter by instructor we lose rowspans
+         *
+         * and now we've removed privates and put all classes into groups. privates are now groups of one
          * */
 
         $tryme = 0;
@@ -2184,19 +2113,6 @@ if(ca($action) == 'daily_schedule') {
                 // $hr_row .= "<td rowspan=".$rowcount[$standard_hour][$ctr]." class='event_time'>$standard_hour:$ctr </td><!-- where it ends -->";
                 $hr_row .= "<td rowspan=".$rowcount[$twentyfour_hour][$ctr]." class='event_time'>$standard_hour:$ctr </td><!-- where it ends -->";
                 $hr_has_classes=true;
-                // $results = print_r($day_arr[$min_hr][$constraint_counter], true);
-                // echo '<pre>';print_r($event_card); echo '</pre>';
-                /* 
-                 * scratch 
-                echo '<pre>';
-                foreach($event_card as $key => $val) {
-                    print_r($val);
-                }
-                echo '<pre>';
-                die();
-                 */
-
-
 
 
                 foreach($event_card as $key => $val) {
@@ -2236,36 +2152,18 @@ if(ca($action) == 'daily_schedule') {
                             }
                             $age_name = 'year'.$plural;
                         }
-                        if($key == 'group' ) {
+                        if($key == 'group' ) { // group/private is obsolete but I don't wanna unwind this code
+                            // sorry future Troy
                             $group_emails.="$login_email,";
                             $results = $tr.'<!-- dynamic tr -->
             <td class="daily_box daily_event">'.$et_name.$et_desc.'</td>
             <td class="daily_box daily_location">'.$location.'</td>
             <td class="daily_box daily_leader">'.$leader.'</td>
             <td class="daily_box daily_students">'.$students.'</td>
-            <td class="daily_box daily_week">N/A</td>
+            <td class="daily_box daily_week">'.$week_no.'</td>
             <td class="daily_box daily_notes">'.$edt_meta.'</td><!-- right after edt_meta -->
             </tr><!-- row tr end -->
                                 ';
-                        }
-                        if($key == 'private' ) {
-                            $private_emails.="$login_email,";
-                            $results = $tr.'<!-- end dynamic tr actually it looks like begin dynamic tr to me -->
-            <td class="daily_box daily_private daily_event">Private Class</td>
-            <td class="daily_box daily_private daily_location">'.$location.'</td>
-            <td class="daily_box daily_private daily_leader">'.$leader.'</td>
-            <td class="daily_box daily_private daily_pname"><div class="daily_schedule_participant">'.$fullname.', '.$age.' '.$age_name.'</div>
-            <div class="daily_schedule_login">
-                <a href="mailto:'.$login_email.'">'.$login_fullname.'<a/>
-                <br>h: '.$phone_h.'
-                <br>w: '.$phone_w.'
-                <br>c: '.$phone_c.'
-            </div>
-            </td>
-            <td class="daily_box daily_private daily_week">'.$week.' </td>
-            <td class="daily_box daily_private ped_meta" id="ped_meta_'.$ped_id.'">
-                <span id="ped_meta_show_'.$ped_id.'">'.nl2br($ped_meta).'</span>
-            </td></tr><!-- right after ped_meta -->';
                         }
                         $hr_row.=$results;
                         $prev_key = $key;
@@ -2487,6 +2385,7 @@ if(ca($action) == 'private_event_card') {
 }
 
 if(ca($action) == 'get_private_event') {
+    // probably not used anymore
     $private_event_id=$_REQUEST['private_event_id'];
     $s_class = new S_class(false);
     $s_class -> db = $db;
@@ -2608,11 +2507,38 @@ if(ca($action) == 'get_event') {
     $s_event = new S_event;
     $s_event -> db = $db;
 
-    $event_id=$_REQUEST['event_id'];
-    $date_time=$_REQUEST['date_time'];
-    $event_time= date('g:i A', $date_time);
+    $s_participant = new S_participant;
+    $s_participant -> db = $db;
+
+    $event_id     = $_REQUEST['event_id'];
+    $date_time    = $_REQUEST['date_time'];
+    $event_time   = date('g:i A', $date_time);
     $event_result = $s_event -> get_event($event_id);
-    $arr=$event_result -> fetch_assoc();
+    $arr          = $event_result -> fetch_assoc();
+
+    // get the event type to see if it's a private
+    $et_res = $s_event->get_event_type_by_id($arr['et_id']);
+    $et_arr = $et_res -> fetch_assoc();
+    $et_activity_level = $et_arr['et_activity_level'];
+
+    if($et_activity_level == 2) { // private class. grab the student
+        $ep_res = $s_participant -> participants_in_event($event_id);
+        $ep_arr = $ep_res -> fetch_assoc();
+        print_r($ep_arr);
+        // sort out some variables to align the php with the javascript (because I am afraid of the javascript)
+        $start = $arr['start'];
+        $end   = $arr['end'];
+
+        $ps_date = DateTime::createFromFormat('Y-m-d H:i:s', $start);
+        $pe_date = DateTime::createFromFormat('Y-m-d H:i:s', $end);
+
+        $private_start = $ps_date -> format('Y-m-d');
+        $private_end   = $pe_date -> format('Y-m-d');
+
+        $private_participant_id = $ep_arr['participant_id'];
+        $private_participant = $ep_arr['fname'].' '.$ep_arr['lname'];
+    }
+
     $edt_id = $_REQUEST['edt_id'];
     if(is_int($edt_id * 1)) {
         // we have an event daytime. get all its data
@@ -2622,10 +2548,11 @@ if(ca($action) == 'get_event') {
         // all I care about for now is the metadata
         $edt_meta = $edt_data['edt_meta'];
     } else {
-echo "well it isn't an int sothere <br>";
-}
-    extract($arr);
+        // echo "well it isn't an int sothere <br>";
+    }
+
     // extract $arr and populate your defaults with its results
+    extract($arr); // ugh why is this down here
 
     $location_result = $s_class -> get_all_locations();
     $location_list = result_as_html_list(new html_Render(), $location_result, 'id', 'location', $location_id);
@@ -3384,6 +3311,7 @@ if(ca($action) == 'get_modal') {
     if($number_participants == '') {
         $number_participants=$default_number_participants;
     }
+    $private_start = date('Y-m-d', $date_time);
     require('templates/myModal.php');
 }
 
@@ -3435,13 +3363,7 @@ if(ca($action) == 'add_class') {
 
     // action=add_class&event_id=&class_id=18&event_type=23&private_start=2018-01-01&private_end=2018-01-29&private_participant=Dakota+Casey&private_participant_id=4184&location_id=1&duration=10&occurance_rate=daily&selected_days%5B1%5D=1&selected_days%5B2%5D=2&selected_days%5B3%5D=3&selected_days%5B4%5D=4&number_participants=1&leader_id=1&edt_meta=test&edt_id=
 
-    // prepare the date and time
-    // $da=explode('_', urldecode($_REQUEST['date_time']));
-    // print_r($da);
     $data['timestamp']              = $_REQUEST['date_time'];
-    $data['date']                   = $da[0];
-    $data['day_number']             = $da[1];
-    $data['event_time']             = $da[2]; // wtf is this.
     $data['class_id']               = $_REQUEST['class_id'];
     $data['location_id']            = $_REQUEST['location_id'];
     $data['occurance_rate']         = $_REQUEST['occurance_rate'];
@@ -3456,7 +3378,7 @@ if(ca($action) == 'add_class') {
     echo '<pre>';
     print_r($data);
 
-
+    
     $s_class = new S_class($data['class_id']);
     $s_class -> db = $db;
 
@@ -3470,8 +3392,24 @@ if(ca($action) == 'add_class') {
     $et_activity_level = $et_arr['et_activity_level'];
 
     if($et_activity_level == 2) { // private class
-        // yay
+        // synchronize start date and timestamp
+
+        $timestamp = $data['timestamp'];
+        $event_time = date('H:i:s', $timestamp);
+        $ts_date = date('Y-m-d', $timestamp);
+
+        if($ts_date != $data['start']) {
+            // user clicked on one date on the calendar and then changed it in the modal
+            // we still track it because that's how we track the hour
+            // thanks past-troy for that
+            $new_timestamp = DateTime::createFromFormat('Y-m-d H:i:s', $data['start'].' '.$event_time);
+            // create a new unix timestamp based on the date they entered
+            $timestamp = $new_timestamp -> format('U');
+            $data['timestamp'] = $timestamp;
+        }
+
         $data['class_id']  = 0; // all privates get a class_id of 0
+    
     } else {
         $result = $s_class->get_class($id);
         $class_row = $result->fetch_assoc();

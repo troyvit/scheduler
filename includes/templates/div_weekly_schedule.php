@@ -16,14 +16,15 @@ foreach($betterweek as $cal_date => $current_day_number) {
     $date_stamp = $date_obj -> format('U');
     $old_date_stamp = date('U', mktime(0,0,0,$this_month, $current_day_number, $this_year));
     if($by_range==true) {
-        $day_name=$day_name.' '.$cal_date;
+        $day_name_class = $day_name.' '.$cal_date;
+        $day_name=$day_name; // wtf ever past-troy
     }
     $last_day=$current_day_number;
     if(in_array($day_name, $days_block)) {
         continue;
     }
 ?>
-    <table border="0" class="day_container"><tr><td colspan="2" class="day_name_container" id="day_name_<?php echo $day_name; ?>">
+    <table border="0" class="day_container"><tr><td colspan="2" class="day_name_container" id="day_name_<?php echo $day_name_class; ?>">
     <?php echo $day_name.' '.$cal_date; ?> 
     <div class="day_control">
     <button class="print_day print_button" id="print_<?php echo $cal_date; ?>" class="print_day"><img style="width:16px; height: 16px;" src="images/printer.svg"></button>
