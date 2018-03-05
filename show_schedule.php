@@ -12,13 +12,14 @@ require ('includes/head_include.php'); ?>
 #hold_daily_schedule select { display: none; }
 </style>
 
-<script type="text/javascript" src="js/svg-injector.min.js"></script>
+<script type="text/javascript" src="js/svg-injector.js"></script>
 <script type="text/javascript" src="js/reveal/jquery.reveal.js"></script>
 
 <script type="text/javascript" src="./js/clipboard.min.js"> </script> <!-- clibpord js thing -->
 
 <script type="text/javascript">
 
+/* get icons */
 var jsConfigs = {
     rpc: 'includes/rpc.php'
 }
@@ -82,12 +83,27 @@ var dailySchedule = {
                     console.log('showing '+to_show+' and hiding '+to_hide);
                     $(to_show).show();
                     $(to_hide).hide();
-                    $('#edt_edit_text_'+edt_id).blur(function(e) {
+                    $('#edt_cancel_'+edt_id).mouseup(function(e) {
+                        $.ajax({
+                            url: "includes/rpc.php",
+                            type: "POST",
+                            data: 'action=get_edt_meta&&edt_id='+edt_id,
+                            dataType: "json",
+                            success: function(result) {
+                                // alert(result.edt_meta);
+                                $('edt_edit_text_'+edt_id).val(result.edt_meta);
+                                $('edt_show_'+edt_id).text(result.edt_meta);
+                                $(to_show).hide();
+                                $(to_hide).show();
+                            }
+                        });
+                        e.stopPropagation();
+                    });
+                    $('#edt_update_'+edt_id).mouseup(function(e) {
                         var edt_meta_arr=this.id.split('_');
                         var edt_meta = $('#edt_edit_text_'+edt_id).val();
                         console.log('we are updating for '+edt_id);
                         // ajax call here
-                        console.log('edt_meta is '+edt_meta);
                         $.ajax({
                             url: "includes/rpc.php",
                             type: "POST",
@@ -95,9 +111,16 @@ var dailySchedule = {
                             dataType: "json",
                             success: function(result) {
                                 // hide the text box and show the text
-                                console.log('and we are returned ');
                                 // success, make sure what was saved is what was shown
                                 // yeah turning over a new leaf
+                                // gave up on that pretty quick.
+                                $('#edt_edit_text_'+edt_id).val(result.edt_meta);
+                                $('#edt_show_'+edt_id).text(result.edt_meta);
+                                // edt_show_77091
+                                console.log("set "+edt_id+" to "+result.edt_meta);
+                                $(to_show).hide();
+                                $(to_hide).show();
+                                /*
                                 $.ajax({
                                     url: "includes/rpc.php",
                                     type: "POST",
@@ -107,6 +130,7 @@ var dailySchedule = {
                                         alert(to_show);
                                     }
                                 });
+                                 */
                                 /*
                                 $('#edt_meta_show_'+edt_id).html(result.edt_meta);
                                 $(to_hide).show();
@@ -114,6 +138,7 @@ var dailySchedule = {
                                  */
                             }
                         });
+                        e.stopPropagation();
                     });
                 });
 
@@ -220,6 +245,9 @@ var modalActivator = {
 }
 
 $(document).ready(function() {
+    var mySVGsToInject = document.querySelectorAll('.iconic-sprite');
+    SVGInjector(mySVGsToInject);
+
     $('#week_start').datepicker({ dateFormat: "yy-mm-dd" });
     $('#week_end').datepicker({ dateFormat: "yy-mm-dd" });
     var class_id='';
@@ -347,6 +375,20 @@ $(document).ready(function() {
 </head>
 <body id="show_schedule">
 <?php require ('includes/templates/admin_nav.php'); ?>
+<!-- icon sprite -->
+<img src="images/sprite/open-iconic.svg" class="iconic-sprite" style="display:none;" />
+
+<!--
+<svg viewBox="0 0 8 8" class="icon">
+    <use xlink:href="#check" class="check"></use>
+</svg>
+
+
+<svg viewBox="0 0 8 8" class="icon">
+    <use xlink:href="#ban" class="ban"></use>
+</svg>
+-->
+
 <table class="schedule_nav"><tr>
 <td>
 <h3><?php echo $sl -> gp('Select a class to work with a group schedule'); ?></h3>

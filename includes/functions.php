@@ -898,8 +898,7 @@ class S_event {
         $query='UPDATE event_daytime
             SET edt_meta="'.$edt_meta.'"
             WHERE id='.$edt_id;
-        // debug // 
-        echo $query.'<br>';
+        // debug // echo $query.'<br>';
         if ($result = $this->db->query($query)) {
             return $result;
         } else {

@@ -2169,6 +2169,17 @@ if(ca($action) == 'daily_schedule') {
                 <span id = "edt_show_'.$edt_id.'">'.$edt_meta.'</span>
                 <span class="edit_edt_meta" id = "edt_edit_'.$edt_id.'">
                 <textarea id="edt_edit_text_'.$edt_id.'">'.$edt_meta.'</textarea>
+
+                <svg viewBox="0 0 8 8" class="icon edt_update" id="edt_update_'.$edt_id.'">
+                    <use xlink:href="#check" class="check"></use>
+                </svg>
+
+
+                <svg viewBox="0 0 8 8" class="icon edt_cancel" id="edt_cancel_'.$edt_id.'">
+                    <use xlink:href="#ban" class="ban"></use>
+                </svg>
+
+
                 </span>
             </td><!-- right after edt_meta -->
             </tr><!-- row tr end -->
@@ -2207,6 +2218,8 @@ if(ca($action) == 'update_edt_meta') {
     $edt_meta = $_REQUEST['edt_meta'];
     $edt_id   = $_REQUEST['edt_id'];
     $result = $s_event -> update_event_daytime_meta($edt_id, $edt_meta);
+    $ret = array("status"=>"success","edt_id" => $edt_id, "edt_meta"=>$edt_meta);
+    echo json_encode($ret);
 }
 
 if(ca($action) == 'get_edt_meta') {

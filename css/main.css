@@ -189,3 +189,9 @@ td.total_row { font-weight: bold; }
 
 /* CRM */
 td.waiver_status { width: 72px; }
+
+/* sprite */
+.icon { width: 16px; height: 16px; }
+
+.icon .check { fill: #00ff00; }
+.icon .ban { fill: #ff0000; }
