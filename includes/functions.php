@@ -1900,6 +1900,14 @@ class S_participant_reg extends S_login_reg {
         return false;
     }
 
+    function participant_waiver_by_id ($participant_waiver_id) {
+        $query = 'SELECT * FROM participant_waiver 
+            WHERE id = '.$participant_waiver_id;
+        if ($result = $this->db->query($query)) {
+            return $result;
+        }
+        return false;
+    }
     function all_participant_waiver ($participant_id) {
         // get all the waivers belonging to a participant
         $query='SELECT p.id AS participant_waiver_id,
@@ -1968,7 +1976,11 @@ class S_participant_reg extends S_login_reg {
 
     function update_participant_waiver_item ($waiver_id, $field_name, $field_val) {
         $query='UPDATE participant_waiver SET '.$field_name.' = "'.$field_val.'" WHERE id='.$waiver_id;
-         // debug // echo $query;
+        if($field_name == 'signature_date') {
+            // ya could just make it a timestamp you know
+            $query='UPDATE participant_waiver SET '.$field_name.' = '.$field_val.' WHERE id='.$waiver_id;
+        }
+        // debug // echo $query;
         if ($result = $this->db->query($query)) {
             return $result;
         } else {

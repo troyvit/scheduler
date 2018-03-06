@@ -495,7 +495,9 @@ if(ca($action) == 'new_register') {
             $signature = '';
             $signature_date=date('Y-m-d');
         }
+        echo '<span id = "waiver_container_'.$waiver_id.'">';
         require('templates/participant_waiver.php');
+        echo '</span>';
         echo '</div><!-- end participant form -->';
     }
     echo '</div><!-- close tabs container -->';
@@ -539,11 +541,22 @@ if(ca($action) == 'new_register') {
     echo '</div></div><!-- end reg section -->';
 }
 
+if(ca($action) == 'reload_waiver') {
+    $waiver_id = $_POST['waiver_id'];
+
+    $w_res = $s_participant_reg->participant_waiver_by_id($waiver_id);
+    $w_arr = $w_res -> fetch_assoc();
+    extract($w_arr); // I vow not to regret this
+
+    require('templates/participant_waiver.php');
+}
+
 if(ca($action) == 'sign_waiver') {
     $s_participant_reg = new S_participant_reg;
     $s_participant_reg -> db = $db; # god i need to fix this
     $waiver_id = $_REQUEST['waiver_id'];
     $res = $s_participant_reg -> update_participant_waiver_item($waiver_id, 'waiver_status', '2');
+    $res = $s_participant_reg -> update_participant_waiver_item($waiver_id, 'signature_date', 'NOW()');
     if($res == true) {
         echo '{"status":"success"}';
     } else {
@@ -772,21 +785,44 @@ if(ca($action) == 'update_p_reg_answer') {
     echo '{"status":"success"}';
 }
 
-/*
-if(ca($action) == 'get_login_screen') {
-    // this is for client logins
-    // is this still used?
-    if($_SESSION['log_level'] > 0) {
-        $s_billing = new S_billing;
-        $s_billing -> db = $db;
+if(ca($action) == 'update_waiver_status') {
+    // update the status of the waiver and optionally reload it
+    $s_participant_reg = new S_participant_reg;
+    $s_participant_reg -> db = $db; # god i need to fix this
 
-        echo "<h3>".$sl->gp('Welcome')." $u_login_fname</h3>";
-        require('templates/billing_line_item.php');
+    $waiver_id = $_REQUEST['waiver_id'];
+    $waiver_status = $_REQUEST['waiver_status'];
+    $reload_waiver = $_REQUEST['reload_waiver'];
+
+    $ret = $s_participant_reg -> update_participant_waiver_item($waiver_id, 'waiver_status', $waiver_status);
+
+    if($reload_waiver == true) {
+        $w_res = $s_participant_reg->participant_waiver_by_id($waiver_id);
+        $w_arr = $w_res -> fetch_assoc();
+        extract($w_arr); // I vow not to regret this
+
+        $s_participant = new S_participant;
+        $s_participant -> db = $db; 
+
+        $participant_res = $s_participant -> get_participant($participant_id);
+        $pa=$participant_res -> fetch_assoc();
+
+        $fname = $pa['fname'];
+        $lname = $pa['lname'];
+
+        $name = "$fname $lname";
+
+        if($waiver_status != 2) {
+            $waiver_viewmode = 'edit';
+        } else {
+            $waiver_viewmode = 'read';
+        }
+
+        require('templates/participant_waiver.php');
     } else {
-        require('templates/login_form.php');
+        echo json_encode(array('status', $ret));
     }
 }
- */
 
 if(ca($action) == 'get_billing_list') {
     /* second try here, and so I'm a little pissed. What I should have done

@@ -31,6 +31,26 @@ var registration = {
         }
     },
 
+    resetWaiver: function (waiver_id) {
+        // make a waiver editable again
+        $.ajax({
+            url: jsConfigs.rpc,
+            type: "POST",
+            dataType: "html",
+            data: "action=update_waiver_status&reload_waiver=true&waiver_id="+waiver_id,
+            success: function(result) {
+                console.log(result);
+                console.log(waiver_id);
+                $('#waiver_container_'+waiver_id).html(result);
+                editing.makeEditable ('editable');
+                $('.waiver_tosign').click(function(e) {
+                    var fieldToDisable = $(this).prev('input').attr('id');
+                    registration.signWaiver(waiver_id, fieldToDisable);
+                });
+                // window.location.reload(true); 
+            }
+        });
+    },
     signWaiver: function (waiver_id, fieldToDisable) {
         // ok this is messed up but the waiver name is updated as part of that massively convoluted function I have that updates waiver fields in general on blur. 
         // this function just seals the deal for the waiver, changing its status to 2 once the user clicks "sign"
@@ -119,6 +139,12 @@ var registration = {
                     console.log('double sigh');
                     var fieldToDisable = $(this).prev('input').attr('id');
                     registration.signWaiver(id_to_use, fieldToDisable);
+                });
+                $('.waiver_reset').click(function(e) {
+                    var waiver_arr = this.id.split(/_/);
+                    var waiver_id = waiver_arr[1];
+                    console.log('we use '+waiver_id);
+                    registration.resetWaiver(waiver_id);
                 });
                 $('.choose_address').click(function(e) {
                     // var partInfo = this.id.split(/_/);

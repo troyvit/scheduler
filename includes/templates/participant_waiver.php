@@ -14,5 +14,8 @@
 <span id="signature_date_<?php echo $participant_id.'_'.$reg_id; ?>">
 <?php echo $signature_date; ?>
 </span>
+<span class="">
+    <input class="waiver_reset ui-button ui-widget ui-state-default ui-corner-all" type="button" id="reset_<?php echo $waiver_id; ?>" name="reset_<?php echo $waiver_id; ?>" value="Reset Signature">
+</span>
 
 <?php } ?>
