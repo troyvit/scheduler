@@ -2001,12 +2001,15 @@ if(ca($action) == 'daily_schedule') {
                     // $students.="$name, $age<br>";
                     $students[$id] .= "<div class='daily_schedule_participant'>$name</div>
 
-            <div class='daily_schedule_login'>
-                <a href='mailto:$login_email'>$login_fullname<a/>
-                <br>h: $phone_h
-                <br>w: $phone_w
-                <br>c: $phone_c
-            </div>";
+                    <div class='daily_schedule_login'>
+                        <a href='mailto:$login_email'>$login_fullname<a/>";
+                    $phonestuff = array('h:' => $phone_h, 'w:' => $phone_w, 'c:' => $phone_c);
+                    foreach($phonestuff as $phonekey => $phoneitem) {
+                        if(strlen(trim($phoneitem)) > 0 && $phoneitem !='na') {
+                            $students[$id].='<br>'.$phonekey.' '.$phoneitem;
+                        }
+                    }
+                    $students[$id] .= "</div>";
                 }
             }
             // echo '<pre>'; print_r($students); echo '</pre>';
