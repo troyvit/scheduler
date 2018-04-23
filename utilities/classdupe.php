@@ -11,11 +11,11 @@ date_default_timezone_set('America/Los_Angeles'); // REALLY?!?!
 require('../includes/config.php');
 require('../includes/functions.php');
 
-$price['group']=66;
+$price['group']=286;
 $amount_due = $price['group']; // you so funny troy
 
-$cf_id=17; // copy-from id
-$ct_id=18; // copy-to id
+$cf_id=18; // copy-from id
+$ct_id=19; // copy-to id
 
 /* you need to set up an array of days that represent the 1st 5 days of the new schedule's week.
  * $day['Monday']=2013-06-13 (or more appropriately probably the timestamp);
@@ -40,13 +40,13 @@ $sd['Sunday']    = date('Y-m-d', mktime (0,0,0, 6, 9, 2013));
 // I can't believe I still have to do this
 // | 10 | Summer 2015 | 2015-06-01 | 2015-08-14 |
 //
-$sd['Tuesday']   = date('U-n-j-Y', mktime (0,0,0, 1, 2, 2018));
-$sd['Wednesday'] = date('U-n-j-Y', mktime (0,0,0, 1, 3, 2018));
-$sd['Thursday']  = date('U-n-j-Y', mktime (0,0,0, 1, 4, 2018));
-$sd['Friday']    = date('U-n-j-Y', mktime (0,0,0, 1, 5, 2018));
-$sd['Saturday']  = date('U-n-j-Y', mktime (0,0,0, 1, 6, 2018));
-$sd['Sunday']    = date('U-n-j-Y', mktime (0,0,0, 1, 7, 2018));
-$sd['Monday']    = date('U-n-j-Y', mktime (0,0,0, 1, 8, 2018));
+$sd['Tuesday']   = date('U-n-j-Y', mktime (0,0,0, 5, 29, 2018));
+$sd['Wednesday'] = date('U-n-j-Y', mktime (0,0,0, 5, 30, 2018));
+$sd['Thursday']  = date('U-n-j-Y', mktime (0,0,0, 5, 31, 2018));
+$sd['Friday']    = date('U-n-j-Y', mktime (0,0,0, 6, 1, 2018));
+$sd['Saturday']  = date('U-n-j-Y', mktime (0,0,0, 6, 2, 2018));
+$sd['Sunday']    = date('U-n-j-Y', mktime (0,0,0, 6, 3, 2018));
+$sd['Monday']    = date('U-n-j-Y', mktime (0,0,0, 6, 4, 2018));
 
 // print_r($sd);
 
@@ -78,7 +78,7 @@ $occurance_rate = 'weekly';
     // $e_res = $s_event -> event_by_location(1);
 
     // get all lap pool events
-    $e_res = $s_event -> event_by_location(1); 
+    $e_res = $s_event -> event_by_location(2); 
 
     // billing stuff
     $event_line_item_id=1; // this pretty much shows where I'm at with that
