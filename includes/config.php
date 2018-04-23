@@ -108,7 +108,8 @@ $lang='en';
 // $price['group']=96;
 // $price['group']=546;
 // $price['group']=286;
-$price['group']=66;
+// $price['group']=66;
+$price['group']=286;
 
 $price['SWM'] = 650; // in db
 $price['FLT'] = 430; // in db

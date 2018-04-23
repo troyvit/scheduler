@@ -555,7 +555,7 @@ if(ca($action) == 'sign_waiver') {
     $s_participant_reg = new S_participant_reg;
     $s_participant_reg -> db = $db; # god i need to fix this
     $waiver_id = $_REQUEST['waiver_id'];
-    $res = $s_participant_reg -> update_participant_waiver_item($waiver_id, 'waiver_status', '2');
+    // $res = $s_participant_reg -> update_participant_waiver_item($waiver_id, 'waiver_status', '2');
     $res = $s_participant_reg -> update_participant_waiver_item($waiver_id, 'signature_date', 'NOW()');
     if($res == true) {
         echo '{"status":"success"}';
@@ -2017,7 +2017,7 @@ if(ca($action) == 'daily_schedule') {
                         <a href='mailto:$login_email'>$login_fullname<a/>";
                     $phonestuff = array('h:' => $phone_h, 'w:' => $phone_w, 'c:' => $phone_c);
                     foreach($phonestuff as $phonekey => $phoneitem) {
-                        if(strlen(trim($phoneitem)) > 0 && $phoneitem !='na') {
+                        if(strlen(trim($phoneitem)) > 0 && $phoneitem !='na' && $phoneitem !='n/a/') {
                             $students[$id].='<br>'.$phonekey.' '.$phoneitem;
                         }
                     }
