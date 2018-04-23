@@ -555,7 +555,7 @@ if(ca($action) == 'sign_waiver') {
     $s_participant_reg = new S_participant_reg;
     $s_participant_reg -> db = $db; # god i need to fix this
     $waiver_id = $_REQUEST['waiver_id'];
-    $res = $s_participant_reg -> update_participant_waiver_item($waiver_id, 'waiver_status', '2');
+    // $res = $s_participant_reg -> update_participant_waiver_item($waiver_id, 'waiver_status', '2');
     $res = $s_participant_reg -> update_participant_waiver_item($waiver_id, 'signature_date', 'NOW()');
     if($res == true) {
         echo '{"status":"success"}';
@@ -1962,6 +1962,17 @@ if(ca($action) == 'daily_schedule') {
             $event_day     = $ga['event_day'];
             $daytime       = $ga['daytime'];
             $event_day_arr = date_parse ( $daytime );
+
+            $lna = explode(" ", $leader); // leader name array
+            $dot = '';
+            $ini = '';
+            foreach($lna as $bit) {
+                $ini.= $dot.substr($bit, 0, 1);
+                $dot = '.';
+            }
+
+            $ini=strtoupper($ini);
+
             // $hour = $event_day_arr['hour'];
             $standard_hour=date("g", strtotime($daytime));
             $twentyfour_hour=date("G", strtotime($daytime));
@@ -1983,6 +1994,7 @@ if(ca($action) == 'daily_schedule') {
                     $participant_id = $epa['participant_id'];
                     $name = $epa['fname'].' '.$epa['lname'];
                     $age = ceil($epa['participant_age_months']/12);
+                    $dob = $epa['dob'];
                     // get parents
                     $part_login_res = $s_participant -> get_logins_by_participant($participant_id);
                     $login_data = $part_login_res ->fetch_assoc();
@@ -1999,14 +2011,17 @@ if(ca($action) == 'daily_schedule') {
                         $login_fullname='Unknown parent';
                     }
                     // $students.="$name, $age<br>";
-                    $students[$id] .= "<div class='daily_schedule_participant'>$name</div>
+                    $students[$id] .= "<div class='daily_schedule_participant'>$name: $dob</div>
 
-            <div class='daily_schedule_login'>
-                <a href='mailto:$login_email'>$login_fullname<a/>
-                <br>h: $phone_h
-                <br>w: $phone_w
-                <br>c: $phone_c
-            </div>";
+                    <div class='daily_schedule_login'>
+                        <a href='mailto:$login_email'>$login_fullname<a/>";
+                    $phonestuff = array('h:' => $phone_h, 'w:' => $phone_w, 'c:' => $phone_c);
+                    foreach($phonestuff as $phonekey => $phoneitem) {
+                        if(strlen(trim($phoneitem)) > 0 && $phoneitem !='na' && $phoneitem !='n/a/') {
+                            $students[$id].='<br>'.$phonekey.' '.$phoneitem;
+                        }
+                    }
+                    $students[$id] .= "</div>";
                 }
             }
             // echo '<pre>'; print_r($students); echo '</pre>';
@@ -2042,6 +2057,7 @@ if(ca($action) == 'daily_schedule') {
                     'et_name'       => $et_name,
                     'et_desc'       => " $et_desc",
                     'leader'        => $leader,
+                    'leader_ini'    => $ini,
                     'event_day'     => $event_day,
                     'daytime'       => $daytime,
                     'event_day_arr' => $event_day_arr,
@@ -2069,7 +2085,6 @@ if(ca($action) == 'daily_schedule') {
     <th class="daily_header spacer" >&nbsp;</th>
     <th class="daily_header daily_event"><span class="phrase">event</span></th>
     <th class="daily_header daily_location"><span class="phrase">location</span></th>
-    <th class="daily_header daily_leader"><span class="phrase">instructor</span></th>
     <th class="daily_header daily_students"><span class="phrase">students</span></th>
     <th class="daily_header daily_week"><span class="phrase">week</span></th>
     <th class="daily_header daily_notes"><span class="phrase">notes</span></th>
@@ -2080,35 +2095,6 @@ if(ca($action) == 'daily_schedule') {
         $hr_show = str_pad($hr_show, 4, "0", STR_PAD_LEFT);
         $standard_hour= date("g", strtotime("$day $hr_show"));
         $twentyfour_hour = date("G", strtotime("$day $hr_show"));
-        // echo "$hr_show (made up of $min_hr and $time_append is $standard_hour\n";
-
-        /* OK listen you are so fucked. You need to know the number of classes at each datetime so you can make sure you have enough rows to hold them. That's one thing and maybe the easy thing.
-         *
-         * Once you know the # of rows you also need to break out that one array to make sure you're getting all the events. As it stands now if you have the same event at the same time it doesn't show on the printable schedule because you don't iterate through the array. you just extract it (search for the word "regret" to see what I mean) and print the first one that comes along 
-         *
-         * compare 1518 of includes/bak.rpc to line 1526 or so of this file
-         *
-         * you have a decent count of each row, but it's in the wrong place. the count happens after you've already declared the # of rows you need to span, so you need to change the logic.
-         *
-         * of course you're avoiding the fact that your logic is embedded thoroughly in your presentation layer and this whole thing needs rewriting.
-         *
-         * OK you need to declare 2 sets of rowspans. One is the hourly rowspan and one is the rowspan for those segments of an hour that contain classes.
-         *
-         * OK so neat you have the rowspans right now for the internal stuff but you don't have a way to distinguish anymore between privates and groups
-         *
-         * yeah basically that whole key is worthless. man I really should rewrite this. the key is worthless because when I thread together the different classes by time I lose whether something is private or not
-         *
-         * Nah it's not as bad as I thought. I thought I did array['private']['other keys']; but really I do array['other keys']['private']['one more key for good measure']
-         *
-         * funny thing is I have a type which is private or group so I don't even need that key.
-         *
-         *
-         * yet when I remove it all hell breaks loose
-         *
-         * OK well I have it looking much better but when you filter by instructor we lose rowspans
-         *
-         * and now we've removed privates and put all classes into groups. privates are now groups of one
-         * */
 
         $tryme = 0;
         while($constraint_counter < 60 ) {
@@ -2196,9 +2182,8 @@ if(ca($action) == 'daily_schedule') {
                             // sorry future Troy
                             $group_emails.="$login_email,";
                             $results = $tr.'<!-- dynamic tr -->
-            <td class="daily_box daily_event">'.$et_name.$et_desc.'</td>
+            <td class="daily_box daily_event">'.$et_name.$et_desc.' <b>'.$leader_ini.'</b></td>
             <td class="daily_box daily_location">'.$location.'</td>
-            <td class="daily_box daily_leader">'.$leader.'</td>
             <td class="daily_box daily_students">'.$students.'</td>
             <td class="daily_box daily_week">'.$week_no.'</td>
             <td class="daily_box daily_notes edt_meta" id="edt_meta_'.$edt_id.'">

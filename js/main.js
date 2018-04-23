@@ -287,7 +287,7 @@ var registration = {
                 $('#reg').validate({
                     submitHandler: function(form)  {
                         console.log("rule obj is "+ruleObj);
-                        alert('reg.validate was called');
+                        // alert('reg.validate was called');
                         $('#billing_reg').submit(); // this should be happening anyway but its validate is supposed to return false
                         console.log('billing_reg went off');
                         return false;
