@@ -325,6 +325,8 @@ $(document).ready(function() {
                         modalActivator.participant_search=true;
                         var private_start =  $('#week_start').val();
                         // not sure why this is here // var private_end   =  $('#week_end').val();
+                        // because javascript shits itself if private_end is undefined
+                        var private_end   =  $('#week_end').val();
                         modalData=modalData+"&private_classes=true&private_start="+private_start+"&private_end="+private_end;
                         participantData.participantSearchFieldLocation='private_participant';
 

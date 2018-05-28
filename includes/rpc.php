@@ -1989,17 +1989,20 @@ if(ca($action) == 'daily_schedule') {
             // debug // echo '<pre>'; print_r($ep_arr); echo '</pre>';
             if(is_array($ep_arr)) {
                 // new classes have 0 students but still take up space in the sched
+                $agebr='';
                 foreach($ep_arr as $ep_id => $epa) {
                     // print_r($epa);
                     $participant_id = $epa['participant_id'];
                     $name = $epa['fname'].' '.$epa['lname'];
-                    $age = ceil($epa['participant_age_months']/12);
+                    // $age = ceil($epa['participant_age_months']/12);
+                    $age = $epa['participant_age_months'];
                     $dob = $epa['dob'];
                     // get parents
                     $part_login_res = $s_participant -> get_logins_by_participant($participant_id);
                     $login_data = $part_login_res ->fetch_assoc();
                     $login_fullname = $login_data['fname'].' '.$login_data['lname'];
                     $login_email = $login_data['email'];
+                    $login_name_formatted = "<a href='mailto:$login_email'>$login_fullname<a/>";
                     $login_id = $login_data['id'];
                     if($login_id != '') {
                         $address_res    = $s_login_reg -> address_by_login_type($login_id, 1);
@@ -2011,17 +2014,33 @@ if(ca($action) == 'daily_schedule') {
                         $login_fullname='Unknown parent';
                     }
                     // $students.="$name, $age<br>";
-                    $students[$id] .= "<div class='daily_schedule_participant'>$name: $dob</div>
-
-                    <div class='daily_schedule_login'>
-                        <a href='mailto:$login_email'>$login_fullname<a/>";
-                    $phonestuff = array('h:' => $phone_h, 'w:' => $phone_w, 'c:' => $phone_c);
-                    foreach($phonestuff as $phonekey => $phoneitem) {
-                        if(strlen(trim($phoneitem)) > 0 && $phoneitem !='na' && $phoneitem !='n/a/') {
-                            $students[$id].='<br>'.$phonekey.' '.$phoneitem;
+                    $age_name=' months ';
+                    $plural = '';
+                    if($age >= $age_month_cutoff) {
+                        // this kid is too old to have an age expressed in months
+                        // echo "age is $age and age_month_cutoff is $age_month_cutoff for $fullname <br>";
+                        // $age=floor($age_month_cutoff/12);
+                        $age=floor($age/12);
+                        if($age > 1) {
+                            $plural='s';
                         }
+                        $age_name = 'year'.$plural;
                     }
-                    $students[$id] .= "</div>";
+                    $dateofbirth[$id] .= $agebr.$dob.'<br>'.$age.' '.$age_name;
+                    $students[$id] .= "<div style='margin-bottom: 1.3em;' class='daily_schedule_participant'>$name</div> ";
+                    if(strlen($phone_c) > 0) {
+                        $phoneitem = $phone_c;
+                        $phonekey='c: ';
+                    } elseif (strlen($phone_w) > 0) {
+                        $phoneitem = $phone_w;
+                        $phonekey='w: ';
+                    } else {
+                        $phoneitem = $phone_h;
+                        $phonekey='h: ';
+                    }
+                    $login_phoneinfo = '<br>'.$phonekey.' '.$phoneitem;
+                    $login_data = $login_name_formatted.$login_phoneinfo; 
+                    $agebr='<br>';
                 }
             }
             // echo '<pre>'; print_r($students); echo '</pre>';
@@ -2050,6 +2069,8 @@ if(ca($action) == 'daily_schedule') {
                     'edt_id'        => $edt_id,
                     'id'            => $id,
                     'students'      => $students[$id],
+                    'dateofbirth'   => $dateofbirth[$id],
+                    'login_data'    => $login_data,
                     'event_id'      => $event_id,
                     'location_id'   => $location_id,
                     'location'      => $location,
@@ -2084,8 +2105,10 @@ if(ca($action) == 'daily_schedule') {
     <th class="daily_header spacer" >&nbsp;</th>
     <th class="daily_header spacer" >&nbsp;</th>
     <th class="daily_header daily_event"><span class="phrase">event</span></th>
-    <th class="daily_header daily_location"><span class="phrase">location</span></th>
-    <th class="daily_header daily_students"><span class="phrase">students</span></th>
+    <th class="daily_header daily_location"><span class="phrase">pool</span></th>
+    <th class="daily_header daily_students"><span class="phrase">student</span></th>
+    <th class="daily_header daily_students"><span class="phrase">date of birth</span></th>
+    <th class="daily_header daily_students"><span class="phrase">parent</span></th>
     <th class="daily_header daily_week"><span class="phrase">week</span></th>
     <th class="daily_header daily_notes"><span class="phrase">notes</span></th>
     </tr>';
@@ -2166,7 +2189,8 @@ if(ca($action) == 'daily_schedule') {
                         // I should date those to better record my infamy
                         // let's add 2015-09-05 to that list of dates then
                         // can I ... add the same date twice?
-                        // let's just say the regret goes waaayyy beond that extract()
+                        // let's just say the regret goes waaayyy beyond that extract()
+                        // not sure why this age stuff is here
                         $age_name=' months ';
                         $plural = '';
                         if($age >= $age_month_cutoff) {
@@ -2181,10 +2205,16 @@ if(ca($action) == 'daily_schedule') {
                         if($key == 'group' ) { // group/private is obsolete but I don't wanna unwind this code
                             // sorry future Troy
                             $group_emails.="$login_email,";
+                            if($et_activity_level == 2 || strpos($et_desc, 'Private' ) !==false) {
+                                // I should be pulling in et_activity_level but I'm not
+                                $et_desc = ' pvt ';
+                            }
                             $results = $tr.'<!-- dynamic tr -->
-            <td class="daily_box daily_event">'.$et_name.$et_desc.' <b>'.$leader_ini.'</b></td>
+            <td class="daily_box daily_event">'.$et_name.$et_desc.'<b>'.$leader_ini.'</b></td>
             <td class="daily_box daily_location">'.$location.'</td>
             <td class="daily_box daily_students">'.$students.'</td>
+            <td class="daily_box daily_dob">'.$dateofbirth.'</td>
+            <td class="daily_box daily_login">'.$login_data.'</td>
             <td class="daily_box daily_week">'.$week_no.'</td>
             <td class="daily_box daily_notes edt_meta" id="edt_meta_'.$edt_id.'">
                 <span id = "edt_show_'.$edt_id.'">'.$edt_meta.'</span>

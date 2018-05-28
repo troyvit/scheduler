@@ -2017,10 +2017,11 @@ class S_participant extends S_login {
     function get_participantby_name($fname, $lname) {
         $query = 'SELECT * FROM participant WHERE fname="'.$fname.'"
             AND lname="'.$lname.'"';
+            echo $query."\n";
         if ($result = $this->db->query($query)) {
             return $result;
         } else {
-            // echo $query.' on line '.__LINE__.'<br>';
+            echo $query.' on line '.__LINE__.'<br>';
             return false;
         }
     }

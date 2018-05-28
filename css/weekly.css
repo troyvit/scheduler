@@ -121,6 +121,10 @@ td.daily_pname, td.daily_page, td.daily_leader, td.daily_login, td.daily_week {
     width: 123px;
 }
 
+body td.daily_location {
+    width:70px;
+}
+
 td.hour_display {
     background-color: #EFEFEF;
     border-bottom: 1px solid #000000;
