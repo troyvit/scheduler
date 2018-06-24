@@ -3383,6 +3383,15 @@ if(ca($action) == 'get_modal') {
 
     $event_result = $s_event -> get_all_event_types();
     $event_list = result_as_html_list(new html_Render(), $event_result, 'id', 'event', ''); // worst idea ever
+    $event_result_again = $s_event -> get_all_event_types();
+    while($ev_arr = $event_result_again -> fetch_assoc()) {
+        $event_type_id = $ev_arr['id'];
+        $et_code = $ev_arr['et_code'];
+        $et_activity_level = $ev_arr['et_activity_level'];
+        $et_name = $ev_arr['et_name'];
+        $et_json_arr[$event_type_id] = $ev_arr;
+    }
+    $et_json = urlencode(json_encode($et_json_arr));
 
     $class_id      = $_REQUEST['class_id'];
     if($class_id*1 == 0) {
