@@ -819,7 +819,7 @@ class S_event {
         return $result;
     }
 
-    function insert_event ($e_name, $class_id) { 
+    function insert_event ($e_name, $class_id) {
         /* insert an event */
         /* you need the first date of the event
          * and you need how often the event repeats (weekly right now)
