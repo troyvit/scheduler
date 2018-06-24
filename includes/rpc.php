@@ -3354,6 +3354,18 @@ if(ca($action) == 'remove_event_participant') {
     $s_billing ->remove_event_participant_billing($event_participant_id);
 
 }
+if(ca($action) == 'test_event_type') {
+    // sigh
+    $event_type_id = $_REQUEST['event_type_id'];
+    $s_event = new S_event;
+    $s_event -> db = $db;
+
+    $et_res = $s_event->get_event_type_by_id($data['et_id']);
+    $et_arr = $et_res -> fetch_assoc();
+    $et_activity_level = $et_arr['et_activity_level'];
+    $ret['et_activity_level'] = $et_activity_level;
+    echo json_encode($ret);
+}
 
 if(ca($action) == 'get_modal') {
 

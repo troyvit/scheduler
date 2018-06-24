@@ -176,6 +176,33 @@ var modalActivator = {
                 $('#ped_meta').click(function(e) {
                     $('#privateNoteEdit').val('Save note edit'); // I will never know the future-troy that will regret this
                 });
+                var et_json = $('#et_json').val();
+                var et_json_decoded = decodeURIComponent((et_json+'').replace(/\+/g, '%20'));
+                var et_obj = JSON.parse(et_json_decoded);
+
+                console.log('our json is '+et_obj);
+                console.log(et_json);
+                for(var someId in et_obj) {
+                    var cur_obj = et_obj[someId];
+                    console.log('someId is '+someId);
+                }
+
+                var pretendObj = et_obj[6];
+                console.dir(pretendObj);
+                $('#event_type').change(function(e) {
+                    console.log('event_type is changed. it is now '+$('#event_type').val());
+                    var cur_et_id = $('#event_type').val();
+                    console.log('and taking a stab at it we are dealing with '+et_obj[cur_et_id]+' which is a part of ');
+                    var et_activity_level = et_obj[cur_et_id].et_activity_level;
+                    if(et_activity_level == 2) {
+                        console.log('it is a private class');
+                        $('#number_participants').val(1);
+                        $('#duration').val(10);
+                        $('#location_id').val(1);
+                        $('#occurance_rate').val('daily');
+                    }
+                });
+
                 $('#privateNoteEdit').click(function(e) {
                     console.log('you are where you think you are');
                     var ped_meta_id = $('#ped_meta_id').val();
