@@ -2627,6 +2627,93 @@ class config  {
 
 }
 
+class mini_admin {
+    var $db;
+    public $config = '{"tables":{"class":{"key":"id","name":"Classes","fields":{"name":{"type":"string","name":"Class Name"},"start":{"type":"date","name":"Start Date"},"end":{"type":"date","name":"End Date"}}},"event_type":{"key":"id","name":"Events","fields":{"et_code":{"type":"string","name":"Event Code"},"et_name":{"type":"string","name":"Event Name"},"et_activity_level":{"type":"int","name":"Group (1), Private (2), Disabled (0)"},"et_desc":{"type":"string","name":"Event Description"}}}}}';
+
+    function unpack_admin () {
+        $json_arr = json_decode($this -> config, true);
+        return $json_arr;
+    }
+
+    function table_update ($table, $field_name, $up_key, $value) {
+        // unpack the config
+
+        $config_arr = $this -> unpack_admin(); 
+
+        $field = $config_arr['tables'][$table]['fields'][$field_name];
+        $type = $field['type'];
+        $name = $field['name'];
+        $key = $config_arr['tables'][$table]['key'];
+
+        $value = $this -> process_value($table, $value, $type);
+
+        $query = "UPDATE $table  SET $field_name = $value WHERE $key = $up_key";
+
+        // debug // echo $query."\n";
+        if ($result = $this->db->query($query)) {
+            $ret['success'] = "Updated $name to $value";
+        } else {
+            $mysql_error = $this->db->error;
+            $ret['error'] = "Failed to update $name to $value, $mysql_error";
+        }
+        return $ret;
+    }
+
+    function get_tables () {
+        $config_arr = $this -> unpack_admin(); 
+        $tables = $config_arr['tables'];
+        return $tables;
+    }
+
+    function get_table_data($table, $table_info) {
+        $fields = $table_info['fields'];
+        $key    = $table_info['key'];
+        foreach($fields as $field_name => $field_data) {
+            $fieldlist[] = $field_name;
+        }
+        $fieldlist = implode(',', $fieldlist);
+
+        $query = "SELECT $key,$fieldlist FROM $table ORDER BY $key";
+        // debug // echo $query."\n";;
+        if ($result = $this->db->query($query)) {
+            while($arr = $result -> fetch_assoc()) {
+                // I don't think I need this $$key = $arr[$key]; //
+                // reason is, we're assuming that the key is already unique, so we
+                // don't need to name its field name. it's just a marker for a 
+                // unique array. When we turn around and use this data as a way
+                // to update we'll refer to the config for the key name.
+                $id = $arr[$key];
+                $ret[$id] = $arr;
+            }
+        } else {
+            $mysql_error = $this->db->error;
+            echo $mysql_error."\n";
+            $ret['error'] = "Failed to get data for $table";
+        }
+
+        return $ret;
+
+        // get the fields
+    }
+
+    function process_value($table, $value, $type) {
+        // table is here in case someday we want table specific process options someday
+        switch($type) {
+        case "string":
+            $formatted_value="'$value'";
+            break;
+        case "int":
+            $formatted_value = $value;
+            break;
+        default: 
+            $formatted_value = $value;
+            break;
+        }
+        return $formatted_value;
+    }
+}
+
 function result_as_json($result) {
     // you need to get this into your class
     // I'm going to regret this
