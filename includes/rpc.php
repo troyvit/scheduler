@@ -4043,4 +4043,45 @@ if(ca($action) == 'request_new_password') {
     }
     // require('./templates/login_form.php');
 }
+
+if(ca($action) == 'mini_admin') {
+
+    // http://troyvit.com/schedule/includes/rpc.php?action=miniadmin&mini_action=update&table=event_type&field_name=et_code&up_key=8&value=FFF
+
+    $mini_action = $_REQUEST['mini_action'];
+    $table = $_REQUEST['table']; // used for mini_action retrieve still 
+
+    // debug // print_r($_REQUEST);
+    $mini_admin = new mini_admin;
+    $mini_admin -> db = $db;
+
+    if($mini_action == 'update') {
+        $id = $_REQUEST['id'];
+        $value = $_REQUEST['value']; // this is where $table comes from for this guy
+
+        $id_json = base64_decode($id);
+
+        // echo $id_json."\n";
+
+        $id_arr = json_decode($id_json, true);
+        print_r($id_arr);
+        $table = $id_arr['table'];
+        $field_name = $id_arr['field_name'];
+        $up_key = $id_arr['id'];
+        $ret = $mini_admin -> table_update($table, $field_name, $up_key, $value);
+        echo json_encode($ret);
+    }
+
+    if($mini_action == 'retrieve') {
+        // retrieve all the tables you can grab
+        $tables = $mini_admin -> get_tables();
+
+        foreach($tables as $table =>  $table_info) {
+            $table_data = $mini_admin -> get_table_data($table, $table_info);
+            // debug // print_r($table_data);
+            require('templates/mini_admin_table.php');
+        }
+    }
+
+}
 ?>

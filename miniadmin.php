@@ -1,5 +1,8 @@
-<html>
-<head>
+<?php 
+require('includes/config.php');
+require('includes/functions.php');
+require('includes/language.php'); // I will regret this
+require ('includes/head_include.php'); ?>
 <title>Mini Admin</title>
 
 
@@ -13,3 +16,21 @@
 </head>
 
 <body>
+<div id="mini_config">
+
+</div>
+
+</body>
+<script>
+var jsConfigs = {
+    rpc: 'includes/rpc.php'
+}
+
+$(document).ready(function() {
+
+    config_edit.get_config_tables();
+    
+
+});
+</script>
+</html>

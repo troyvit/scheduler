@@ -28,11 +28,21 @@ $cf = count($fields);
 </tr>
 
 <?php 
+$update['table'] = $table;
+
 foreach($table_data as $id => $data_arr) {
     echo '<tr id="td_row_'.$id.'">';
     foreach($fields as $field_name => $field_info) {
+    echo '<td><!--';
+        print_r($field_info);
+        print_r($data_arr);
+        $html_id['table'] = $table; 
+        $html_id['field_name'] = $field_name;
+        $html_id['id'] = $id;
+        $html_id_complete = base64_encode(json_encode($html_id));
         // calling off of field_name to make extra sure that th eonly data we pull is data specified by the config.
-        echo '<td>'.$data_arr[$field_name].'</td>';
+        
+        echo '--><input type="text" class = "config_edit" name = "" id="'.$html_id_complete.'" value="'.$data_arr[$field_name].'"><!--<br>'.$html_id_complete.'--></td>';
     }
     echo '</tr>';
 }

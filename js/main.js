@@ -492,6 +492,38 @@ var editing = {
     }
 }
 
+var config_edit = {
+    get_config_tables: function() {
+        $.ajax({
+            url: jsConfigs.rpc,
+            type: "GET",
+            dataType: "html",
+            data: "action=mini_admin&mini_action=retrieve",
+            success: function(result) {
+                $("#mini_config").html(result);
+                $(".config_edit").blur(function(e) {
+                    config_edit.edit_config_value(this.id);
+                });
+            }
+        });
+    },
+    edit_config_value: function(config_field) {
+        console.log('gonna edit '+config_field);
+        // var config_val = $('#field_'+config_field).val(); // gtfh jQuery
+        var config_val = document.getElementById(config_field).value;
+        console.log(config_val);
+        $.ajax({
+            url: jsConfigs.rpc,
+            type: "GET",
+            dataType: "html",
+            data: "action=mini_admin&mini_action=update&id="+config_field+"&value="+config_val,
+            success: function(result) {
+                console.log(result);
+            }
+        });
+    }
+}
+
 var login = {
     login_status: 'false',
     check_login: function (email, password) {
