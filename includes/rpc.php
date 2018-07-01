@@ -2630,6 +2630,17 @@ if(ca($action) == 'get_event') {
         $private_participant = $ep_arr['fname'].' '.$ep_arr['lname'];
     }
 
+    $event_result_again = $s_event -> get_all_event_types();
+    while($ev_arr = $event_result_again -> fetch_assoc()) {
+        $event_type_id = $ev_arr['id'];
+        $et_code = $ev_arr['et_code'];
+        $et_activity_level = $ev_arr['et_activity_level'];
+        $et_name = $ev_arr['et_name'];
+        $et_json_arr[$event_type_id] = $ev_arr;
+    }
+    $et_json = urlencode(json_encode($et_json_arr));
+
+
     $edt_id = $_REQUEST['edt_id'];
     if(is_int($edt_id * 1)) {
         // we have an event daytime. get all its data
@@ -3368,6 +3379,7 @@ if(ca($action) == 'test_event_type') {
 }
 
 if(ca($action) == 'get_modal') {
+    // this is used when somebody clicks on an empty slot in the schedule.
 
     $s_class = new S_class(false);
     $s_class -> db = $db;
