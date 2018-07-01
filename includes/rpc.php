@@ -1955,6 +1955,7 @@ if(ca($action) == 'daily_schedule') {
             $et_arr        = result_as_array(new serialized_Render(), $s_event->get_event_type_by_id($et_id), 'id');
             $et_name       = $et_arr[$et_id]['et_name'];
             $et_desc       = $et_arr[$et_id]['et_desc'];
+            $et_code       = $et_arr[$et_id]['et_code'];
             $location_id   = $ga['location_id'];
             $location      = $location_arr[$location_id];
             $leader_id     = $ga['leader_id'];
@@ -2077,6 +2078,7 @@ if(ca($action) == 'daily_schedule') {
                     'leader_id'     => $leader_id,
                     'et_name'       => $et_name,
                     'et_desc'       => " $et_desc",
+                    'et_code'       => " $et_code",
                     'leader'        => $leader,
                     'leader_ini'    => $ini,
                     'event_day'     => $event_day,
@@ -2210,7 +2212,7 @@ if(ca($action) == 'daily_schedule') {
                                 $et_desc = ' pvt ';
                             }
                             $results = $tr.'<!-- dynamic tr -->
-            <td class="daily_box daily_event">'.$et_name.$et_desc.'<b>'.$leader_ini.'</b></td>
+            <td class="daily_box daily_event">'.$et_code.' - <b>'.$leader_ini.'</b></td>
             <td class="daily_box daily_location">'.$location.'</td>
             <td class="daily_box daily_students">'.$students.'</td>
             <td class="daily_box daily_dob">'.$dateofbirth.'</td>
