@@ -4055,6 +4055,8 @@ if(ca($action) == 'mini_admin') {
 
     // debug // print_r($_REQUEST);
     $mini_admin = new mini_admin;
+    $mini_admin -> config = $myconfig['mini_admin_config']['option_value'];
+    
     $mini_admin -> db = $db;
 
     if($mini_action == 'update') {
