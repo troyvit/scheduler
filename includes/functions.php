@@ -2629,7 +2629,7 @@ class config  {
 
 class mini_admin {
     var $db;
-    public $config = '{"tables":{"class":{"key":"id","name":"Classes","fields":{"name":{"type":"string","name":"Class Name"},"start":{"type":"date","name":"Start Date"},"end":{"type":"date","name":"End Date"}}},"event_type":{"key":"id","name":"Events","fields":{"et_code":{"type":"string","name":"Event Code"},"et_name":{"type":"string","name":"Event Name"},"et_activity_level":{"type":"int","name":"Group (1), Private (2), Disabled (0)"},"et_desc":{"type":"string","name":"Event Description"}}},"location":{"key":"id","name":"Locations","fields":{"location":{"type":"string","name":"Pool Location"}}},"leader":{"key":"id","name":"Instructors","fields":{"fname":{"type":"string","name":"First Name"},"lname":{"type":"string","name":"Last Name"},"email":{"type":"string","name":"Email"},"activity_level":{"type":"int","name":"Active (1), Inactive (0)"}}}}}';
+    public $config;
 
     function unpack_admin () {
         $json_arr = json_decode($this -> config, true);
@@ -2658,6 +2658,12 @@ class mini_admin {
             $ret['error'] = "Failed to update $name to $value, $mysql_error";
         }
         return $ret;
+    }
+
+    function table_insert ($table, $fields) {
+        foreach($fields as $raw_field_name) {
+
+        }
     }
 
     function get_tables () {
