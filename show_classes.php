@@ -21,8 +21,10 @@ var makePrintable = {
         makePrintable.oldContainerClass = $('#hold_class_container').attr('class');
         console.log('saved it as '+makePrintable.oldContainerClass);
         $('#hold_class_container').attr('class', 'col-1-1');
+        $('#hold_class_container').css('overflow', 'visible');
         makePrintable.oldContainerHeight = $('#hold_classes').css('height');
         $('#hold_classes').css('height', '100%');
+        $('#hold_classes').css('overflow', 'visible');
         $('#printButton').attr('value', 'Return to normal');
         $('#printButton').click(function(e) {
             makePrintable.makeClassesUnPrintable();
@@ -37,7 +39,9 @@ var makePrintable = {
         console.log('turning it back into '+makePrintable.oldContainerClass);
         // $('#hold_class_container').attr('class', makePrintable.oldContainerClass);
         $('#hold_class_container').attr('class', 'col-7-12');
+        $('#hold_class_container').css('border-left', '12px solid green');
         $('#hold_classes').css('height', makePrintable.oldContainerHeight);
+        $('#hold_class_container').css('overflow', 'auto');
     },
     tellContainerClass: function() {
         console.log(makePrintable.old_container_class);

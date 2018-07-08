@@ -10,6 +10,7 @@ require ('includes/head_include.php'); ?>
 <style type="text/css"  media="print">
 .schedule_nav, #hold_schedule, #hold_modal, #closehds { display: none; }
 #hold_daily_schedule select { display: none; }
+#hold_daily_schedule { overflow: visible; height: 100%; }
 </style>
 
 <script type="text/javascript" src="js/svg-injector.js"></script>
