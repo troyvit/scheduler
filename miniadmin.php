@@ -15,6 +15,20 @@ require ('includes/head_include.php'); ?>
 
 </head>
 
+<style type="text/css">
+
+body { text-align: center; }
+
+table { margin: 300px auto; }
+
+#admin_nav { font-size: 18px; font-weight: bold; margin-top: 3em; }
+
+#admin_nav .divider_pipe { margin: 14px; }
+
+td.what_tr_is_for { font-size: 14px; font-weight: bold; }
+
+</style>
+
 <body>
 <div id="mini_config">
 

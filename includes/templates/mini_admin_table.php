@@ -11,10 +11,12 @@ $cf = count($fields);
 // print_r($table_info);
 ?>
 
+
 <table border=1 id = "table_<?php echo $table; ?>">
 <tr>
-<td id="mini_admin_<?php echo $table; ?>" colspan = "<?php echo $cf; ?>">
+<td class="what_tr_is_for" id="mini_admin_<?php echo $table; ?>" colspan = "<?php echo $cf; ?>">
     <?php echo $name; ?>
+    <a name="<?php echo "link_".$table; ?>" id="<?php echo "link_".$table; ?>"></a>
 </td>
 </tr>
 
@@ -48,6 +50,11 @@ foreach($table_data as $id => $data_arr) {
 }
 ?>
 
+<tr>
+<td colspan = "<?php echo $cf; ?>">
+<a href="#top">Return to top</a><br>
+</td>
+</tr>
 
 
 </table>

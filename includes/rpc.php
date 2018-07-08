@@ -4080,6 +4080,15 @@ if(ca($action) == 'mini_admin') {
         // retrieve all the tables you can grab
         $tables = $mini_admin -> get_tables();
 
+        echo '<a name="top"></a>';
+
+        echo '<div id="admin_nav">';
+        foreach($tables as $table =>  $table_info) {
+            echo $pipe.'<a href="#link_'.$table.'">Edit '.$table_info['name'].'</a>';
+            $pipe = '<span class="divider_pipe">|</span>'; 
+        }
+        echo '</div>';
+
         foreach($tables as $table =>  $table_info) {
             $table_data = $mini_admin -> get_table_data($table, $table_info);
             // debug // print_r($table_data);
