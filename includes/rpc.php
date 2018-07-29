@@ -839,7 +839,7 @@ if(ca($action) == 'get_billing_list') {
 
     $class_id='';
 
-    if($_REQUEST['class_id'] * 1 > 0) {
+    if($_REQUEST['class_id'] * 1 >= 0) {
         $class_id=$_REQUEST['class_id'];
     } else {
         $class_id = $default_class_id;
@@ -854,7 +854,6 @@ if(ca($action) == 'get_billing_list') {
         $ap_res=$s_participant -> get_orphan_participants();
         $ap=result_as_array(new serialized_Render(), $ap_res, 'ep_id');
     } else {
-
         // grab all the participants in the class
         $ap_res=$s_participant -> participants_in_class($class_id);
         $ap=result_as_array(new serialized_Render(), $ap_res, 'ep_id');
@@ -1969,7 +1968,7 @@ if(ca($action) == 'daily_schedule') {
             $ini = '';
             foreach($lna as $bit) {
                 $ini.= $dot.substr($bit, 0, 1);
-                $dot = '.';
+                $dot = ''; // used to be a .
             }
 
             $ini=strtoupper($ini);
@@ -2027,7 +2026,8 @@ if(ca($action) == 'daily_schedule') {
                         }
                         $age_name = 'year'.$plural;
                     }
-                    $dateofbirth[$id] .= $agebr.$dob.'<br>'.$age.' '.$age_name;
+                    // $dateofbirth[$id] .= $agebr.$dob.'<br>'.$age.' '.$age_name;
+                    $dateofbirth[$id] .= $agebr.$age.' '.$age_name.'<br>'.$dob;;
                     $students[$id] .= "<div style='margin-bottom: 1.3em;' class='daily_schedule_participant'>$name</div> ";
                     if(strlen($phone_c) > 0) {
                         $phoneitem = $phone_c;
@@ -2039,7 +2039,7 @@ if(ca($action) == 'daily_schedule') {
                         $phoneitem = $phone_h;
                         $phonekey='h: ';
                     }
-                    $login_phoneinfo = '<br>'.$phonekey.' '.$phoneitem;
+                    $login_phoneinfo = '<br><span class="phoneitem">'.$phonekey.' '.$phoneitem.'</span>';
                     $login_data = $login_name_formatted.$login_phoneinfo; 
                     $agebr='<br>';
                 }
@@ -2131,7 +2131,7 @@ if(ca($action) == 'daily_schedule') {
         $constraint_counter = 0;
         $hr_has_classes=false;
         $newrowspan=$rowspan;
-        $hr_row="<!-- start standard_hour tr --><tr>
+        $hr_row="<!-- start standard_hour tr --><tr class='new_hour_begin'>
             <td class='hour_display' rowspan=$tryme>$standard_hour </td>";
         $tr='';
         while($constraint_counter < 60 ) {

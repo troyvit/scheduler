@@ -69,6 +69,7 @@ $(document).ready(function() {
                 cb+='<option value="'+data.id+'">'+data.name+'</option>';
             });
                 cb+='<option value="orphans">Show All Orphans</option>';
+                cb+='<option value="0">Private classes</option>';
             $("#classSelect").append(cb);
             $('#classSelect').change(function(e) {
                 billingData.getAllBills(); 

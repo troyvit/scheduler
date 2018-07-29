@@ -125,6 +125,10 @@ body td.daily_location {
     width:70px;
 }
 
+tr.new_hour_begin {
+    border-top: 5px solid #000000;
+}
+
 td.hour_display {
     background-color: #EFEFEF;
     border-bottom: 1px solid #000000;

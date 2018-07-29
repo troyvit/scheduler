@@ -8,10 +8,39 @@ require ('includes/head_include.php'); ?>
 <link rel="stylesheet" href="js/reveal/reveal.css" />
 
 <style type="text/css"  media="print">
+/* fixes for printing */
+#hold_daily_schedule { overflow: visible; height: 100%; }
+
+#hold_daily_schedule .daily_login a { color: #000000; text-decoration: none; }
+/* #hold_daily_schedule .daily_box  { font-size: 24px; } */ /* this just doesn't work */
+/* #hold_daily_schedule .daily_box * { font-size: 24px; } */ /* this works for anything that has a tag inside .daily_box */
+
+
+/* things to hide while printing */
 .schedule_nav, #hold_schedule, #hold_modal, #closehds { display: none; }
 #hold_daily_schedule select { display: none; }
-#hold_daily_schedule { overflow: visible; height: 100%; }
+.daily_location, .daily_notes { display: none !important; }
+span.phoneitem { display: none; }
+
+
+/* things to unhide while printing */
+body {
+    font-size: 16px;    /* or pt if you want */
+}
+
+#hold_daily_schedule .daily_box { font-size: 250%; } 
+
+h2 { color: #ff0000; }
+
+
 </style>
+<style type="text/css">
+
+
+
+#hold_daily_schedule .daily_box { font-size: 14px; } 
+</style>
+
 
 <script type="text/javascript" src="js/svg-injector.js"></script>
 <script type="text/javascript" src="js/reveal/jquery.reveal.js"></script>

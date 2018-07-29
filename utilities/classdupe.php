@@ -11,11 +11,11 @@ date_default_timezone_set('America/Los_Angeles'); // REALLY?!?!
 require('../includes/config.php');
 require('../includes/functions.php');
 
-$price['group']=286;
+$price['group']=390;
 $amount_due = $price['group']; // you so funny troy
 
-$cf_id=18; // copy-from id
-$ct_id=19; // copy-to id
+$cf_id=19; // copy-from id
+$ct_id=20; // copy-to id
 
 /* you need to set up an array of days that represent the 1st 5 days of the new schedule's week.
  * $day['Monday']=2013-06-13 (or more appropriately probably the timestamp);
@@ -40,13 +40,22 @@ $sd['Sunday']    = date('Y-m-d', mktime (0,0,0, 6, 9, 2013));
 // I can't believe I still have to do this
 // | 10 | Summer 2015 | 2015-06-01 | 2015-08-14 |
 //
-$sd['Tuesday']   = date('U-n-j-Y', mktime (0,0,0, 5, 29, 2018));
-$sd['Wednesday'] = date('U-n-j-Y', mktime (0,0,0, 5, 30, 2018));
-$sd['Thursday']  = date('U-n-j-Y', mktime (0,0,0, 5, 31, 2018));
-$sd['Friday']    = date('U-n-j-Y', mktime (0,0,0, 6, 1, 2018));
-$sd['Saturday']  = date('U-n-j-Y', mktime (0,0,0, 6, 2, 2018));
-$sd['Sunday']    = date('U-n-j-Y', mktime (0,0,0, 6, 3, 2018));
-$sd['Monday']    = date('U-n-j-Y', mktime (0,0,0, 6, 4, 2018));
+$sd['Monday']    = date('U-n-j-Y', mktime (0,0,0, 8, 27, 2018));
+$sd['Tuesday']   = date('U-n-j-Y', mktime (0,0,0, 8, 28, 2018));
+$sd['Wednesday'] = date('U-n-j-Y', mktime (0,0,0, 8, 29, 2018));
+$sd['Thursday']  = date('U-n-j-Y', mktime (0,0,0, 8, 30, 2018));
+$sd['Friday']    = date('U-n-j-Y', mktime (0,0,0, 8, 31, 2018));
+$sd['Saturday']  = date('U-n-j-Y', mktime (0,0,0, 9, 1, 2018));
+$sd['Sunday']    = date('U-n-j-Y', mktime (0,0,0, 9, 2, 2018));
+
+/* ok since it bugs me every time. All I really need is the start date.
+ * then while($i < 7) { get the next day's date in U-m-j-Y format an the next day's date in l format (that's a lowercase L).
+ * then I just build the $sd array that way 
+ * I marked below where you'd stick it. Need to look php dates back up again. */
+
+$numdays = 7;
+
+$i = 0;
 
 // print_r($sd);
 
@@ -60,6 +69,9 @@ $occurance_rate = 'weekly';
     $result = $s_class->get_class();
     $class_row = $result->fetch_assoc();
     $start = $class_row['start'];
+
+    // stick the new way to find dates here
+
     $class_name = $class_row['name'];
 
     $s_event = new S_event;
@@ -75,10 +87,10 @@ $occurance_rate = 'weekly';
     // 1 represents the round pool
     // 2 represents the lap pool
     // get all round pool events
-    // $e_res = $s_event -> event_by_location(1);
+    $e_res = $s_event -> event_by_location(1);
 
     // get all lap pool events
-    $e_res = $s_event -> event_by_location(2); 
+    // $e_res = $s_event -> event_by_location(2); 
 
     // billing stuff
     $event_line_item_id=1; // this pretty much shows where I'm at with that
