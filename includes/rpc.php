@@ -1538,11 +1538,6 @@ if(ca($action) == 'daily_schedule') {
 
     $class_id = $_REQUEST['class_id'];
 
-    if($class_id == '') {
-        $class_id = $default_class_id;
-    }
-
-
     $s_class = new S_class(false);
     $s_class -> db = $db;
     $s_class->class_id = $class_id;
@@ -1561,6 +1556,17 @@ if(ca($action) == 'daily_schedule') {
 
     $now = date('Y-m-d H:i:s'); // used to calculate week number of provate classes
 
+    // find out what class id your date range is in
+    // this will override any class_id sent by the post
+    $class_arr = $s_class -> class_by_date($day);
+    if(is_array($class_arr)) {
+        $class_id = $class_arr['id'];
+    } else {
+        $class_id = $default_class_id;
+    }
+    // debug // echo '<br>'.$class_id.'</br>';
+    $s_class -> class_id = $class_id;
+
     // get all leaders so we can filter
     $leader_result = $s_class -> get_all_leaders();
     while($la =$leader_result -> fetch_assoc()) {
@@ -1574,7 +1580,6 @@ if(ca($action) == 'daily_schedule') {
         }
         $leader_list.='<option '.$sel.' value="'.$id.'">'.$la['leader'].'</option>';
     }
-
 
     $location_result = $s_class -> get_all_locations();
     while($la = $location_result -> fetch_assoc()) {
@@ -1612,7 +1617,6 @@ if(ca($action) == 'daily_schedule') {
             $event_day     = $ga['event_day'];
             $daytime       = $ga['daytime'];
             $event_day_arr = date_parse ( $daytime );
-
             $lna = explode(" ", $leader); // leader name array
             $dot = '';
             $ini = '';
@@ -1678,7 +1682,7 @@ if(ca($action) == 'daily_schedule') {
                     }
                     // $dateofbirth[$id] .= $agebr.$dob.'<br>'.$age.' '.$age_name;
                     // $dateofbirth[$id] .= $agebr.$age.' '.$age_name.'<br>'.$dob;;
-                    $dateofbirth[$id] .= $agebr.'<span id = "daily_age_'.$id.'" class="daily_age">'.$age.' '.$age_name.'</span><br><span class="daily_date_of_birth">'.$dob.'</span>';
+                    $dateofbirth[$id] .= '<span id = "daily_age_'.$id.'" class="daily_age">'.$agebr.$age.' '.$age_name.'</span><span class="daily_date_of_birth"><br>'.$dob.'</span>';
                     $students[$id] .= "<div style='margin-bottom: 1.3em;' class='daily_schedule_participant'>$name</div> ";
                     if(strlen($phone_c) > 0) {
                         $phoneitem = $phone_c;
@@ -2510,7 +2514,7 @@ if(ca($action) == 'get_events') {
         if($day == '') {
             $e_res ='';
         } else {
-            $e_res = $s_class -> get_all_events_by_day($day);
+            $e_res = $s_class -> get_all_events_by_day_with_class($day);
         }
     }
 
