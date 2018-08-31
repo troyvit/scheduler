@@ -1940,7 +1940,8 @@ if(ca($action) == 'daily_schedule') {
     // echo '<pre>'; print_r($group_arr); echo '</pre>';
     if(is_array($group_arr)) {
         foreach($group_arr as $ga) {
-            $students=""; // reset this var so we can make a list of students
+            $students      = ""; // reset this var so we can make a list of students
+            $login_data    = ""; // reset this var so we can make a list of students
             $show_event    = true;
             $id            = $ga['id'];
             $class_id      = $ga['class_id']; // class_id of 0 means it's a private class
@@ -2027,7 +2028,8 @@ if(ca($action) == 'daily_schedule') {
                         $age_name = 'year'.$plural;
                     }
                     // $dateofbirth[$id] .= $agebr.$dob.'<br>'.$age.' '.$age_name;
-                    $dateofbirth[$id] .= $agebr.$age.' '.$age_name.'<br>'.$dob;;
+                    // $dateofbirth[$id] .= $agebr.$age.' '.$age_name.'<br>'.$dob;;
+                    $dateofbirth[$id] .= $agebr.'<span id = "daily_age_'.$id.'" class="daily_age">'.$age.' '.$age_name.'</span><br><span class="daily_date_of_birth">'.$dob.'</span>';
                     $students[$id] .= "<div style='margin-bottom: 1.3em;' class='daily_schedule_participant'>$name</div> ";
                     if(strlen($phone_c) > 0) {
                         $phoneitem = $phone_c;
@@ -3802,7 +3804,7 @@ if(ca($action) == 'update_waiver_by_id') {
     $s_participant_reg -> db = $db;
 
     if(in_array($field_name, $allowed_fieldnames)) {
-        echo "updating! \n";
+        echo '{"update":"updating!"}';
         $s_participant_reg -> update_participant_waiver_item($participant_waiver_id, $field_name, $field_val);
     }
 }
@@ -3895,6 +3897,12 @@ if(ca($action) == 'get_participants_by_login') {
             $ws_id                         = $w_arr['ws_id'];
             $reg_id                        = $w_arr['reg_id'];
             $participant_section_group_id  = $w_arr['participant_section_group_id']; // this field name got picked on a lot in school.
+            if($w_arr['participant_waiver_id']) {
+                $participant_waiver_id         = $w_arr['participant_waiver_id'];
+            } else {
+                $participant_waiver_id         = '';
+            }
+            $the_other_participant_waiver_id = $w_arr['participant_waiver_id']; // I clear out participant_waiver_id for the dropdown menu but not for the text field that hold the amount.
             // see if they are in a section_group yet
             $def_sel=''; // default select value for the form section group dropdown
             if($participant_section_group_id > 0) {
@@ -3913,7 +3921,6 @@ if(ca($action) == 'get_participants_by_login') {
                 $reg_login_id = $s_login_arr['id'];
                 $def_sel=' selected="selected" ';
             }
-            $participant_waiver_id = $w_arr['participant_waiver_id'];
             if($amount_due == '') {
                 if($participant_num==1) {
                     $amount_due=$registration['orig'];
@@ -3936,15 +3943,22 @@ if(ca($action) == 'get_participants_by_login') {
                     $selected='';
                     $w_status_show = '';
                 }
-                $sg_sel.='<option '.$selected.' value="'.$participant_id.':'.$reg_login_id.':'.$reg_id.':'.$sg_id.'">'.$group_name.$w_status_show.'</option>'; 
+            if(strlen($w_status_show) == 0) {
+                // show the participant waiver id so we can reset it
+                // I am using some very bad logic here. sorry future troy
+                $participant_waiver_id = '';
+            } else {
+                $waiver_id_tag = 'waiver:'.$participant_waiver_id;
             }
-            $sg_sel='<option '.$def_sel.' value="0">Select a registration form</option>'.$sg_sel;
+                $sg_sel.='<option '.$selected.' value="'.$participant_id.':'.$reg_login_id.':'.$reg_id.':'.$sg_id.':'.$participant_waiver_id.'">'.$group_name.$w_status_show.'</option>'; 
+            }
+            $sg_sel = '<option '.$def_sel.' value="0">Select a registration form</option>'.$sg_sel; // idiot
             if($waiver_status=='') {
                 $waiver_status = 'no registration';
             }
             if($ws_id != 2) { 
                 // 2 means complete, and I'm sorry future-future-troy (and future-troy)
-                $amount_due='<input class="input_money editable" type="text" name="waiver_by_id|amount_due|participant_waiver_id|'.$participant_waiver_id.'" id="participant_waiver_amount_'.$participant_waiver_id.'" value="'.$amount_due.'">';
+                $amount_due='<input class="input_money editable" type="text" name="waiver_by_id|amount_due|participant_waiver_id|'.$the_other_participant_waiver_id.'" id="participant_waiver_amount_'.$the_other_participant_waiver_id.'" value="'.$amount_due.'">';
             }
             $part_controls='';
             $participant_class='';
