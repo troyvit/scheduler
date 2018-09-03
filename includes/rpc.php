@@ -1554,7 +1554,11 @@ if(ca($action) == 'daily_schedule') {
     $s_login_reg = new S_login_reg;
     $s_login_reg -> db = $db; # god i need to fix this
 
-    $now = date('Y-m-d H:i:s'); // used to calculate week number of provate classes
+    $date_obj = new DateTime($day);
+
+    $now = $date_obj -> format('Y-m-d H:i:s');
+
+    // $now = date('Y-m-d H:i:s'); // used to calculate week number of provate classes
 
     // find out what class id your date range is in
     // this will override any class_id sent by the post
@@ -1594,33 +1598,33 @@ if(ca($action) == 'daily_schedule') {
     // echo '<pre>'; print_r($group_arr); echo '</pre>';
     if(is_array($group_arr)) {
         foreach($group_arr as $ga) {
-            $students      = ""; // reset this var so we can make a list of students
-            $login_data    = ""; // reset this var so we can make a list of students
-            $show_event    = true;
-            $id            = $ga['id'];
-            $class_id      = $ga['class_id']; // class_id of 0 means it's a private class
-            $event_id      = $ga['event_id'];
-            $start         = $ga['start']; // start and end are for privates only
-            $end           = $ga['end']; // start and end are for privates only
-            $et_id         = $ga['et_id'];
-            $edt_id        = $ga['edt_id'];
-            $edt_meta      = $ga['edt_meta'];
+            $students           = ""; // reset this var so we can make a list of students
+            $login_text_data    = ""; // reset this var so we can make a list of students
+            $show_event         = true;
+            $id                 = $ga['id'];
+            $class_id           = $ga['class_id']; // class_id of 0 means it's a private class
+            $event_id           = $ga['event_id'];
+            $start              = $ga['start']; // start and end are for privates only
+            $end                = $ga['end']; // start and end are for privates only
+            $et_id              = $ga['et_id'];
+            $edt_id             = $ga['edt_id'];
+            $edt_meta           = $ga['edt_meta'];
             // get the event type
-            $et_arr        = result_as_array(new serialized_Render(), $s_event->get_event_type_by_id($et_id), 'id');
-            $et_name       = $et_arr[$et_id]['et_name'];
-            $et_desc       = $et_arr[$et_id]['et_desc'];
-            $et_code       = $et_arr[$et_id]['et_code'];
-            $location_id   = $ga['location_id'];
-            $location      = $location_arr[$location_id];
-            $leader_id     = $ga['leader_id'];
-            $leader        = $leader_arr[$leader_id];
-            $event_day     = $ga['event_day'];
-            $daytime       = $ga['daytime'];
-            $event_day_arr = date_parse ( $daytime );
+            $et_arr             = result_as_array(new serialized_Render(), $s_event->get_event_type_by_id($et_id), 'id');
+            $et_name            = $et_arr[$et_id]['et_name'];
+            $et_desc            = $et_arr[$et_id]['et_desc'];
+            $et_code            = $et_arr[$et_id]['et_code'];
+            $location_id        = $ga['location_id'];
+            $location           = $location_arr[$location_id];
+            $leader_id          = $ga['leader_id'];
+            $leader             = $leader_arr[$leader_id];
+            $event_day          = $ga['event_day'];
+            $daytime            = $ga['daytime'];
+            $event_day_arr      = date_parse ( $daytime );
             $lna = explode(" ", $leader); // leader name array
             $dot = '';
             $ini = '';
-            foreach($lna as $bit) {
+            foreach($lna as $bit) { // leader name array. use it to make leader initials
                 $ini.= $dot.substr($bit, 0, 1);
                 $dot = ''; // used to be a .
             }
@@ -1656,7 +1660,7 @@ if(ca($action) == 'daily_schedule') {
                     $login_data = $part_login_res ->fetch_assoc();
                     $login_fullname = $login_data['fname'].' '.$login_data['lname'];
                     $login_email = $login_data['email'];
-                    $login_name_formatted = "<a href='mailto:$login_email'>$login_fullname<a/>";
+                    $login_name_formatted = "<a class='login_link' href='mailto:$login_email'>$login_fullname</a>";
                     $login_id = $login_data['id'];
                     if($login_id != '') {
                         $address_res    = $s_login_reg -> address_by_login_type($login_id, 1);
@@ -1684,6 +1688,8 @@ if(ca($action) == 'daily_schedule') {
                     // $dateofbirth[$id] .= $agebr.$age.' '.$age_name.'<br>'.$dob;;
                     $dateofbirth[$id] .= '<span id = "daily_age_'.$id.'" class="daily_age">'.$agebr.$age.' '.$age_name.'</span><span class="daily_date_of_birth"><br>'.$dob.'</span>';
                     $students[$id] .= "<div class='daily_schedule_participant'>$name</div> ";
+
+                    // done with students. now do parents
                     if(strlen($phone_c) > 0) {
                         $phoneitem = $phone_c;
                         $phonekey='c: ';
@@ -1694,11 +1700,14 @@ if(ca($action) == 'daily_schedule') {
                         $phoneitem = $phone_h;
                         $phonekey='h: ';
                     }
-                    $login_phoneinfo = '<br><span class="phoneitem">'.$phonekey.' '.$phoneitem.'</span>';
-                    $login_data = $login_name_formatted.$login_phoneinfo; 
-                    $agebr='<br>';
+                    $login_phoneinfo = '<span class="phoneitem"><br class="phoneinfobreak">'.$phonekey.' '.$phoneitem.'</span>';
+                    $login_text_data .= $agebr.$login_name_formatted.$login_phoneinfo; 
+                    // echo "saving $login_text_data right now <br>";
+                    $agebr='<br class="agebreak">';
                 }
             }
+            // echo "|".$login_text_data.'|<br>';
+            // echo '<pre>'; print_r($login_text_data); echo '</pre>';
             // echo '<pre>'; print_r($students); echo '</pre>';
 
             if($show_event == true) {
@@ -1727,7 +1736,7 @@ if(ca($action) == 'daily_schedule') {
                     'id'            => $id,
                     'students'      => $students[$id],
                     'dateofbirth'   => $dateofbirth[$id],
-                    'login_data'    => $login_data,
+                    'login_data'    => $login_text_data,
                     'event_id'      => $event_id,
                     'location_id'   => $location_id,
                     'location'      => $location,
@@ -1742,6 +1751,8 @@ if(ca($action) == 'daily_schedule') {
                     'event_day_arr' => $event_day_arr,
                     'edt_meta'      => $edt_meta,
                 );
+                // echo "we just saved "; echo $login_text_data; echo " into day_arr, using $id as the id <br>";
+                // echo "we just saved "; echo $students[$id]; echo " into day_arr, using $id as the id <br>";
                 // $n_rowspan[$twentyfour_hour][$minutes] += count($day_arr[$twentyfour_hour][$minutes]['group']);
             }
         }
@@ -1764,7 +1775,7 @@ if(ca($action) == 'daily_schedule') {
     <th class="daily_header spacer" >&nbsp;</th>
     <!-- <th class="daily_header daily_event"><span class="phrase">event</span></th> -->
     <th class="daily_header daily_students"><span class="phrase">student</span></th>
-    <th class="daily_header daily_dob"><span class="phrase">date of birth</span></th>
+    <th class="daily_header daily_dob"><span class="phrase">Age/DOB</span></th>
     <th class="daily_header daily_login"><span class="phrase">parent</span></th>
     <th class="daily_header daily_week"><span class="phrase">wk/Event-Inst</span></th>
     <th class="daily_header daily_location"><span class="phrase">pool</span></th>
@@ -1841,6 +1852,16 @@ if(ca($action) == 'daily_schedule') {
                         $data = $val[$sub_key];
                         // debug // echo '<pre>'; print_r($data); echo '</pre>';
                         extract($data); // will I regret that?
+                        /*
+                        echo '<b>Students</b><br>';
+                        echo '<pre>';
+                        print_r($students);
+                        echo '</pre>';
+                        echo '<b>logins</b><br>';
+                        echo '<pre>';
+                        print_r($login_data);
+                        echo '</pre>';
+*/
                         /*
                         $login_email = $data['login_email'];
                         $et_name     = $data['et_name'];
@@ -2330,7 +2351,6 @@ if(ca($action) == 'get_event') {
     $event_result = $s_event -> get_all_event_types();
     $event_list = result_as_html_list(new html_Render(), $event_result, 'id', 'event', $et_id);
 
-    require('templates/myModal.php');
 
 }
 
@@ -3059,7 +3079,8 @@ if(ca($action) == 'get_modal') {
     $s_event -> db = $db;
 
     $event_result = $s_event -> get_all_event_types();
-    $event_list = result_as_html_list(new html_Render(), $event_result, 'id', 'event', ''); // worst idea ever
+    // $event_list = result_as_html_list(new html_Render(), $event_result, 'id', 'event', ''); // worst idea ever
+    $event_list = result_as_html_list(new html_Render(), $event_result, 'id', 'et_code', ''); // worst idea ever
     $event_result_again = $s_event -> get_all_event_types();
     while($ev_arr = $event_result_again -> fetch_assoc()) {
         $event_type_id = $ev_arr['id'];

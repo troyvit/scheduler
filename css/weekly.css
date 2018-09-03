@@ -125,6 +125,7 @@ td.daily_box {
 }
 
 td.daily_pname, td.daily_page, td.daily_leader, td.daily_login, td.daily_week {
+    text-transform: capitalize;
     width: 123px;
 }
 

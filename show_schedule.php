@@ -17,6 +17,13 @@ require ('includes/head_include.php'); ?>
 		position:relative;
     }
 
+    #hold_daily_schedule .daily_login { 
+        margin-bottom: 0 !important; // shrink margin just because 
+        white-space: nowrap !important;
+        text-transform: capitalize;
+        width: 220px;
+    }
+
     #hold_daily_schedule .daily_schedule_participant {
         margin-bottom: 0 !important; // shrink margin because we're hiding dob
     }
@@ -238,17 +245,24 @@ var modalActivator = {
 
                 var pretendObj = et_obj[6];
                 console.dir(pretendObj);
+                console.log('that wsa the pretentOdb');
                 $('#event_type').change(function(e) {
                     console.log('event_type is changed. it is now '+$('#event_type').val());
                     var cur_et_id = $('#event_type').val();
                     console.log('and taking a stab at it we are dealing with '+et_obj[cur_et_id]+' which is a part of ');
                     var et_activity_level = et_obj[cur_et_id].et_activity_level;
+                    console.log('activity level is '+et_activity_level);
                     if(et_activity_level == 2) {
                         console.log('it is a private class');
                         $('#number_participants').val(1);
                         $('#duration').val(10);
                         $('#location_id').val(1);
                         $('#occurance_rate').val('daily');
+                    } else {
+                        $('#number_participants').val(4);
+                        $('#duration').val(30);
+                        $('#location_id').val(2);
+                        $('#occurance_rate').val('weekly');
                     }
                 });
 
