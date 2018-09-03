@@ -65,7 +65,8 @@ $has_config=true;
 
 # $default_class_id=3;
 // $default_class_id=14; // fall 2016
-$default_class_id=19; // summer 2018
+// $default_class_id=19; // summer 2018
+$default_class_id=20; // fall 2018
 
 // login defaults
 // $logout_hours = 24; // after 24 hours you are logged out

@@ -322,6 +322,19 @@ class S_class {
         }
     }
 
+    function class_by_date($date) {
+        // wtf // $query='SELECT id, name, start, end FROM class'.$this->class_id;
+        // dbl wtf in light of the above 
+        $query='SELECT id, name, start, end FROM class WHERE start < "'.$date.'" AND end > "'.$date.'"';
+        // debug // echo $query.'<br>';
+        if ($result = $this->db->query($query)) {
+            $row = $result->fetch_assoc();
+            return $row;
+        } else {
+            return false;
+        }
+    }
+
     function get_class_set ($ids, $order_by='') {
         // get a group of classes and order them by something
         foreach($ids as $id) {
@@ -511,6 +524,24 @@ class S_class {
     }
 
     function get_all_events_by_day($day)  {
+        // consider making one of these that doesn't depend on class_id
+        $query = 'SELECT event.*, event_daytime.*, 
+            event_daytime.id as edt_id,
+            DAYNAME(event_daytime.daytime) AS event_day,
+            DATE_FORMAT(event_daytime.daytime, "%l:%i %p") as event_time
+            FROM event, event_daytime 
+            WHERE event_daytime.daytime like "'.$day.'%" 
+            AND event_daytime.event_id=event.id and event.class_id in (0, '.$this->class_id.')
+            ORDER BY event_daytime.daytime';
+        // debug // echo $query; die();
+
+        if ($result = $this->db->query($query)) {
+            return $result;
+        }
+    }
+
+
+    function get_all_events_by_day_with_class($day)  {
         // consider making one of these that doesn't depend on class_id
         $query = 'SELECT event.*, event_daytime.*, 
             event_daytime.id as edt_id,

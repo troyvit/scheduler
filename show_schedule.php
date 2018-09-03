@@ -8,36 +8,55 @@ require ('includes/head_include.php'); ?>
 <link rel="stylesheet" href="js/reveal/reveal.css" />
 
 <style type="text/css"  media="print">
-/* fixes for printing */
-#hold_daily_schedule { overflow: visible; height: 100%; }
+    /* fixes for printing */
+    #hold_daily_schedule { overflow: visible; height: 100%; }
 
-#hold_daily_schedule .daily_login a { color: #000000; text-decoration: none; }
-/* #hold_daily_schedule .daily_box  { font-size: 24px; } */ /* this just doesn't work */
-/* #hold_daily_schedule .daily_box * { font-size: 24px; } */ /* this works for anything that has a tag inside .daily_box */
+    #hold_daily_schedule .daily_login a { 
+        color: #000000;
+		text-decoration: none;
+		position:relative;
+    }
 
+    #hold_daily_schedule .daily_schedule_participant {
+        margin-bottom: 0 !important; // shrink margin because we're hiding dob
+    }
 
-/* things to hide while printing */
-.schedule_nav, #hold_schedule, #hold_modal, #closehds { display: none; }
-#hold_daily_schedule select { display: none; }
-.daily_location, .daily_notes { display: none !important; }
-span.phoneitem { display: none; }
+    /* #hold_daily_schedule .daily_box  { font-size: 24px; } */ /* this just doesn't work */
+    /* #hold_daily_schedule .daily_box * { font-size: 24px; } */ /* this works for anything that has a tag inside .daily_box */
 
+    .daily_age { 
+        position: relative; 
+    }
 
-/* things to unhide while printing */
-body {
-    font-size: 16px;    /* or pt if you want */
-}
+    #show_schedule #hold_daily_schedule { border: none; position:absolute; top: 0px;}
+    #show_schedule #hold_daily_schedule h2 {
+        margin-top: 0px; 
+        margin-bottom: 0px; 
+        color: #ff0000;
+    }
 
-#hold_daily_schedule .daily_box { font-size: 250%; } 
+    body {
+        font-size: 16px;    /* or pt if you want */
+    }
 
-h2 { color: #ff0000; }
+    #hold_daily_schedule .daily_box { 
+        font-size: 250%; 
+        padding-top: 1px;
+        padding-bottom: 1px;
+    }
 
+    h2 { color: #ff0000; }
+
+    /* things to hide while printing */
+    .schedule_nav, #hold_schedule, #hold_modal, #closehds { display: none; } /* little close button */
+    #hold_daily_schedule select { display: none; } /* all dropdowns */
+    .daily_location, .daily_notes { display: none !important; } /* hide notes and location */
+    span.phoneitem { display: none; } /* hide phone number */
+    .daily_date_of_birth { display: none; } /* hide dob */
 
 </style>
+
 <style type="text/css">
-
-
-
 #hold_daily_schedule .daily_box { font-size: 14px; } 
 </style>
 

@@ -78,9 +78,12 @@ table.schedule_nav th {
     padding: 8px
 }  
 
-.daily_schedule_participant { 
+.daily_schedule_participant {
     white-space: nowrap; 
     font-weight: bold;
+    position: relative;
+    margin-bottom: 1.3em;
+    top: 0px;
 }
 
 td.daily_private {
@@ -115,7 +118,11 @@ td.daily_event, td.daily_location, td.daily_leader {
     display: none;
 }
 
-td.daily_box { width: 114px; border-right: 1px solid #000000; }
+td.daily_box { 
+    width: 114px;
+	border-right: 1px solid #000000;
+	vertical-align: text-top;
+}
 
 td.daily_pname, td.daily_page, td.daily_leader, td.daily_login, td.daily_week {
     width: 123px;
@@ -125,6 +132,13 @@ body td.daily_location {
     width:70px;
 }
 
+td.rowcount_1 {
+    background-color: #efefef;
+}
+
+td.rowcount_0 {
+    background-color: #ffffff;
+}
 tr.new_hour_begin {
     border-top: 5px solid #000000;
 }

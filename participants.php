@@ -30,6 +30,7 @@ var participantData = {
             data: "action=get_participants_by_login&login_id="+login_id,
             dataType: "html",
             success: function(result) {
+                $('.reset_waiver_status').hide(); // because I'm too lazy to edit a .css file
                 // alert('did '+participant_id+' into '+event_id);
                 // var obj = jQuery.parseJSON(result);
                 // alert(result);
@@ -46,14 +47,39 @@ var participantData = {
 
                 $('.participant_section_group').change(function() {
                     var ftc='for teh console. get it?!? G$H IT?!? ID is '+this.id+' and vlue is '+this.value+' and that\'s all she rote';
+                    var waiver_id = '';
                     console.log(ftc);
-                    // participant_id, reg_id, section_group_id 
+                    // participant_id, reg_id, section_group_id, waiver id
                     var sg_arr = this.value.split(":");
                     var participant_id     = sg_arr[0];
                     var reg_login_id       = sg_arr[1];
                     var reg_id             = sg_arr[2];
                     var section_group_id   = sg_arr[3];
+                    waiver_id              = sg_arr[4];
+                    if(waiver_id.length > 0) {
+                        $('.reset_waiver_status').show();
+                        $('.reset_waiver_status').attr("id", 'waiver:'+waiver_id);
+                        console.log('just set the id of reset_waiver_status to waiver:'+waiver_id);
+                    } else {
+                        $('.reset_waiver_status').hide();
+                    }
                     participantData.updateParticipantSectionGroup (participant_id, section_group_id, reg_login_id, reg_id);
+                });
+
+                $('.reset_waiver_status').click(function() {
+                    console.log('you totally clicked me');
+                    var waiver_arr = this.id.split(":");
+                    var participant_waiver_id = waiver_arr[1];
+                    $.ajax({
+                        url: jsConfigs.rpc,
+                        type: "POST",
+                        data: "action=update_waiver_by_id&participant_waiver_id="+participant_waiver_id+"&field_name=waiver_status&field_val=3",
+                        dataType: "json",
+                        success: function(result) {
+                            console.log('we are getting particpants for '+login_id);
+                            participantData.getParticipantsByLogin(login_id);
+                        }
+                    });
                 });
 
                 $('.participant_calendar').datepicker({ 

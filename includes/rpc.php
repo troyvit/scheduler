@@ -1683,7 +1683,7 @@ if(ca($action) == 'daily_schedule') {
                     // $dateofbirth[$id] .= $agebr.$dob.'<br>'.$age.' '.$age_name;
                     // $dateofbirth[$id] .= $agebr.$age.' '.$age_name.'<br>'.$dob;;
                     $dateofbirth[$id] .= '<span id = "daily_age_'.$id.'" class="daily_age">'.$agebr.$age.' '.$age_name.'</span><span class="daily_date_of_birth"><br>'.$dob.'</span>';
-                    $students[$id] .= "<div style='margin-bottom: 1.3em;' class='daily_schedule_participant'>$name</div> ";
+                    $students[$id] .= "<div class='daily_schedule_participant'>$name</div> ";
                     if(strlen($phone_c) > 0) {
                         $phoneitem = $phone_c;
                         $phonekey='c: ';
@@ -1712,7 +1712,8 @@ if(ca($action) == 'daily_schedule') {
                         // day 1 of the class I guess?
                         $week_no = 1;
                     }
-                    $week_no = "$week_no/$total_weeks";
+                    // $week_no = "$week_no/$total_weeks";
+                    $week_no = "$week_no/"; // combines with # weeks attached to classname now
                 } else {
                     $week_no = "N/A";
                 }
@@ -1733,7 +1734,7 @@ if(ca($action) == 'daily_schedule') {
                     'leader_id'     => $leader_id,
                     'et_name'       => $et_name,
                     'et_desc'       => " $et_desc",
-                    'et_code'       => " $et_code",
+                    'et_code'       => "$et_code",
                     'leader'        => $leader,
                     'leader_ini'    => $ini,
                     'event_day'     => $event_day,
@@ -1761,14 +1762,15 @@ if(ca($action) == 'daily_schedule') {
     <tr class="daily daily_group">
     <th class="daily_header spacer" >&nbsp;</th>
     <th class="daily_header spacer" >&nbsp;</th>
-    <th class="daily_header daily_event"><span class="phrase">event</span></th>
-    <th class="daily_header daily_location"><span class="phrase">pool</span></th>
+    <!-- <th class="daily_header daily_event"><span class="phrase">event</span></th> -->
     <th class="daily_header daily_students"><span class="phrase">student</span></th>
-    <th class="daily_header daily_students"><span class="phrase">date of birth</span></th>
-    <th class="daily_header daily_students"><span class="phrase">parent</span></th>
-    <th class="daily_header daily_week"><span class="phrase">week</span></th>
+    <th class="daily_header daily_dob"><span class="phrase">date of birth</span></th>
+    <th class="daily_header daily_login"><span class="phrase">parent</span></th>
+    <th class="daily_header daily_week"><span class="phrase">wk/Event-Inst</span></th>
+    <th class="daily_header daily_location"><span class="phrase">pool</span></th>
     <th class="daily_header daily_notes"><span class="phrase">notes</span></th>
     </tr>';
+    $ec_counter = 0;
     while($min_hr < $max_hr) {
         $constraint_counter = 0;
         $hr_show=$min_hr.$time_append;
@@ -1823,6 +1825,12 @@ if(ca($action) == 'daily_schedule') {
 
                 foreach($event_card as $key => $val) {
                     foreach($val as $sub_key => $data) {
+                        // $ec_counter++;
+                        if($ec_counter == 0) {
+                            $ec_counter = 1;
+                        } else {
+                            $ec_counter = 0;
+                        }
                         if($key != $prev_key) {
                             $extra_style=' margin-top: 16px; ';
                         } else {
@@ -1867,13 +1875,13 @@ if(ca($action) == 'daily_schedule') {
                                 $et_desc = ' pvt ';
                             }
                             $results = $tr.'<!-- dynamic tr -->
-            <td class="daily_box daily_event">'.$et_code.' - <b>'.$leader_ini.'</b></td>
-            <td class="daily_box daily_location">'.$location.'</td>
-            <td class="daily_box daily_students">'.$students.'</td>
-            <td class="daily_box daily_dob">'.$dateofbirth.'</td>
-            <td class="daily_box daily_login">'.$login_data.'</td>
-            <td class="daily_box daily_week">'.$week_no.'</td>
-            <td class="daily_box daily_notes edt_meta" id="edt_meta_'.$edt_id.'">
+            <!--<td class="daily_box daily_event">'.$et_code.' - <b>'.$leader_ini.'(<pre>'.$tr.'</pre>)</b></td> -->
+            <td class="rowcount_'.$ec_counter.' daily_box daily_students">'.$students.'</td>
+            <td class="rowcount_'.$ec_counter.' daily_box daily_dob">'.$dateofbirth.'</td>
+            <td class="rowcount_'.$ec_counter.' daily_box daily_login">'.$login_data.'</td>
+            <td class="rowcount_'.$ec_counter.' daily_box daily_week">'.$week_no.$et_code.' - '.$leader_ini.'</td>
+            <td class="rowcount_'.$ec_counter.' daily_box daily_location">'.$location.'</td>
+            <td class="rowcount_'.$ec_counter.' daily_box daily_notes edt_meta" id="edt_meta_'.$edt_id.'">
                 <span id = "edt_show_'.$edt_id.'">'.$edt_meta.'</span>
                 <span class="edit_edt_meta" id = "edt_edit_'.$edt_id.'">
                 <textarea id="edt_edit_text_'.$edt_id.'">'.$edt_meta.'</textarea>

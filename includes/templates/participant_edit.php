@@ -39,6 +39,7 @@ if($participant_num == 1) {
             <select id="ps_group_<?php echo $participant_id; ?>" class="participant_section_group" name="ps_group_<?php echo $participant_id; ?>">
             <?php echo $sg_sel; ?>
             </select> 
+                <button class="reset_waiver_status" id = "<?php echo $waiver_id_tag; ?>">Reset waiver</button>
         </td>
         <td class="waiver_amount_due">
             <?php echo $amount_due; ?>
