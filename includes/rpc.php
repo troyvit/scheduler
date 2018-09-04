@@ -2351,6 +2351,7 @@ if(ca($action) == 'get_event') {
     $event_result = $s_event -> get_all_event_types();
     $event_list = result_as_html_list(new html_Render(), $event_result, 'id', 'event', $et_id);
 
+    require('templates/myModal.php');
 
 }
 
