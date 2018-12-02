@@ -7,9 +7,26 @@ require ('includes/head_include.php'); ?>
 <link rel="stylesheet" href="css/weekly.css" />
 <link rel="stylesheet" href="js/reveal/reveal.css" />
 
+<style>
+</style>
+
 <style type="text/css"  media="print">
     /* fixes for printing */
+    @page
+    {
+        size: auto;   /* auto is the initial value */
+
+        /* this affects the margin in the printer settings */
+        margin: 17mm 15mm 0mm 0mm !important;
+        border: 3px solid green !important;
+    }
+
     #hold_daily_schedule { overflow: visible; height: 100%; }
+
+    body
+    {
+      margin: 0 !important;
+    }
 
     #hold_daily_schedule .daily_login a { 
         color: #000000;
@@ -49,7 +66,25 @@ require ('includes/head_include.php'); ?>
     #hold_daily_schedule .daily_box { 
         font-size: 250%; 
         padding-top: 1px;
-        padding-bottom: 1px;
+        padding-bottom: 1cm;
+    }
+    #hold_daily_schedule .daily_box_private { 
+        padding-bottom: 0cm;
+    }
+
+    #hold_daily_schedule td {
+        /* border-bottom: 1px solid red; */
+    }
+
+
+    #hold_daily_schedule .daily_schedule_participant, 
+    #hold_daily_schedule .daily_age,
+    #hold_daily_schedule .login_link,
+    #hold_daily_schedule .class_code
+    {
+        /* width: 100% !important;
+        border-bottom: 1px solid #000000 !important;
+        */  
     }
 
     h2 { color: #ff0000; }
@@ -57,7 +92,8 @@ require ('includes/head_include.php'); ?>
     /* things to hide while printing */
     .schedule_nav, #hold_schedule, #hold_modal, #closehds { display: none; } /* little close button */
     #hold_daily_schedule select { display: none; } /* all dropdowns */
-    .daily_location, .daily_notes { display: none !important; } /* hide notes and location */
+    /* .daily_location, .daily_notes { display: none !important; } */ /* hide notes and location */
+    .daily_location { display: none !important; } /* hide notes and location */
     span.phoneitem { display: none; } /* hide phone number */
     .daily_date_of_birth { display: none; } /* hide dob */
 
