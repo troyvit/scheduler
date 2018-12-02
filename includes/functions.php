@@ -355,9 +355,9 @@ class S_class {
         }
     }
 
-    function get_all_classes() {
+    function get_all_classes($orderby='') {
         // wtf // $query='SELECT id, name, start, end FROM class'.$this->class_id;
-        $query='SELECT id, name, start, end FROM class';
+        $query='SELECT id, name, start, end FROM class '.$orderby;
         if ($result = $this->db->query($query)) {
             return $result;
         }
@@ -863,7 +863,7 @@ class S_event {
     function set_location($location_id) {
         $this->location_id=$location_id;
     }
-    
+
     function get_all_event_types($et_activity_level='') {
         if(strlen($et_activity_level) > 0) {
             $clause = ' WHERE et_activity_level = '.$et_activity_level.' ';
@@ -2134,6 +2134,21 @@ class S_participant extends S_login {
         }
     }
 
+    function get_private_participants() {
+        $query = 'SELECT event_participant.*, 
+            event_participant.id as ep_id
+            FROM event_participant
+            LEFT JOIN event ON event.id = event_participant.event_id
+            LEFT JOIN event_type ON event.et_id = event_type.id
+            WHERE event_type.et_activity_level=2';
+        // debug // echo $query.'<br>';
+        if ($result = $this->db->query($query)) {
+            return $result;
+        } else {
+            return false;
+        }
+    }
+    
     function get_orphan_participants() {
         // get all orphans
         $query='SELECT event_participant.*,
@@ -2433,7 +2448,7 @@ class S_billing {
             FROM event_participant_billing, event_line_item
             WHERE event_participant_billing.event_participant_id='.$event_participant_id.' 
             AND event_participant_billing.event_line_item_id = event_line_item.id';
-            // debug // echo 'CHECK!!<br>'.$query.'<br>';
+        // debug // echo $query.'<br>';
         if ($result = $this->db->query($query)) {
             return $result;
         }
