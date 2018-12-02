@@ -98,7 +98,7 @@
     </tr>
 </table>
 
-<?php if($view_mode == 'edit') { ?>
+<?php if($view_mode == 'edit' || $waiver_viewmode == 'edit') { ?>
     <div id="sig_registration_pay" class="sigPad">
         <label for="registration_signature_<?php echo $login_id.'_'.$reg_id; ?>"><?php echo $sl->gp('Please enter your name'); ?></label>
         <input class="editable" name="reg_login|registration_signed_name|lreg|<?php echo $login_id.','.$reg_id; ?>" id="registration_signed_name_<?php echo $login_id.'_'.$reg_id; ?>" type="text" value="<?php echo $registration_signed_name; ?>" required>
@@ -108,7 +108,7 @@
     <input type="hidden" name="login_id" value="<?php echo $login_id; ?>">
     <input type="hidden" name="participant_ids" value="<?php echo $participant_ids; ?>">
     <input type="hidden" name="reg_id" value="<?php echo $reg_id; ?>">
-<?php } elseif ($view_mode == 'read') { ?>
+<?php } elseif ($view_mode == 'read' && $waiver_viewmode == 'read') { ?>
 
     <h3><?php echo $registration_signed_name; ?></h3>
 
