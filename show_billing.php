@@ -8,6 +8,7 @@ require ('includes/bootstrap_include.php'); ?>
     <script type="text/javascript">
     var billingData = {
         getAllBills: function() {
+            console.log('inside getAllBills');
             var extra_param = '';
             var class_id=$('#classSelect').val();
             if(class_id !=undefined) {
@@ -19,12 +20,14 @@ require ('includes/bootstrap_include.php'); ?>
             }
             // for now just get all the bills associated with a class
             // eventually we'll add a dropdown menu
+            console.log(jsConfigs.rpc+'?action=get_billing_list'+extra_param);
             $.ajax({
                 url: jsConfigs.rpc,
                 type: "GET",
                 data: "action=get_billing_list"+extra_param,
                 dataType: "html",
                 success: function(result) {
+                    console.log('that went great!');
                     $('#billing_list').html(result);
                     table_sorter( '#billing_table' ).hover().filter( '#filter1' );
                     editing.makeEditable ('editable');
@@ -69,14 +72,16 @@ $(document).ready(function() {
                 cb+='<option value="'+data.id+'">'+data.name+'</option>';
             });
                 cb+='<option value="orphans">Show All Orphans</option>';
-                cb+='<option value="0">Private classes</option>';
+                cb+='<option value="privates">Private classes</option>';
             $("#classSelect").append(cb);
             $('#classSelect').change(function(e) {
                 billingData.getAllBills(); 
             });
         }
     });
+    console.log('getting all billing');
     billingData.getAllBills(); 
+    console.log('got all billing');
     /* $("#billing_table").sortr(); */
 });
     </script>
