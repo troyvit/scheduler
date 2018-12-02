@@ -255,6 +255,7 @@ if(ca($action) == 'new_register') {
         $reg_status                = $rl_arr['reg_status'];
         // debug // echo "status is $reg_status for $reg_login_id<br>";
         if($reg_status == 2 && strlen($registration_signed_name) > 0) { // pain and sadness, suffering and woe
+            // not sure what this is // echo "we made it read here <br>";
             $view_mode = 'read';
         }
     }
@@ -839,7 +840,7 @@ if(ca($action) == 'get_billing_list') {
 
     $class_id='';
 
-    if($_REQUEST['class_id'] * 1 >= 0) {
+    if(strlen($_REQUEST['class_id']) > 0 && $_REQUEST['class_id'] * 1 >= 0) {
         $class_id=$_REQUEST['class_id'];
     } else {
         $class_id = $default_class_id;
@@ -852,6 +853,11 @@ if(ca($action) == 'get_billing_list') {
     if($_REQUEST['orphans']=='true') {
         // grab all orphaned participants
         $ap_res=$s_participant -> get_orphan_participants();
+        $ap=result_as_array(new serialized_Render(), $ap_res, 'ep_id');
+    } elseif($_REQUEST['class_id'] == 'privates') {
+        $s_event -> class_id = 0; // private class id. sorry future troy
+        // grab all private participants
+        $ap_res=$s_participant -> get_private_participants();
         $ap=result_as_array(new serialized_Render(), $ap_res, 'ep_id');
     } else {
         // grab all the participants in the class
@@ -1180,7 +1186,7 @@ if(ca($action) == 'logout') {
 if(ca($action)=='get_all_classes') {
     $s_class = new S_class(false);
     $s_class -> db = $db;
-    $result=$s_class->get_all_classes();
+    $result=$s_class->get_all_classes(' ORDER BY id desc');
     // $arr = result_as_array($result);
     $class_arr = result_as_array(new serialized_Render(), $result, 'id');
     $class_arr[$default_class_id]['default']='true';
@@ -1614,6 +1620,7 @@ if(ca($action) == 'daily_schedule') {
             $et_name            = $et_arr[$et_id]['et_name'];
             $et_desc            = $et_arr[$et_id]['et_desc'];
             $et_code            = $et_arr[$et_id]['et_code'];
+            $et_activity_level  = $et_arr[$et_id]['et_activity_level'];
             $location_id        = $ga['location_id'];
             $location           = $location_arr[$location_id];
             $leader_id          = $ga['leader_id'];
@@ -1744,6 +1751,7 @@ if(ca($action) == 'daily_schedule') {
                     'et_name'       => $et_name,
                     'et_desc'       => " $et_desc",
                     'et_code'       => "$et_code",
+                    'et_activity_level' => $et_activity_level,
                     'leader'        => $leader,
                     'leader_ini'    => $ini,
                     'event_day'     => $event_day,
@@ -1894,15 +1902,18 @@ if(ca($action) == 'daily_schedule') {
                             if($et_activity_level == 2 || strpos($et_desc, 'Private' ) !==false) {
                                 // I should be pulling in et_activity_level but I'm not
                                 $et_desc = ' pvt ';
+                                $td_extraclass = 'daily_box_private';
+                            } else {
+                                $td_extraclass = '';
                             }
                             $results = $tr.'<!-- dynamic tr -->
             <!--<td class="daily_box daily_event">'.$et_code.' - <b>'.$leader_ini.'(<pre>'.$tr.'</pre>)</b></td> -->
-            <td class="rowcount_'.$ec_counter.' daily_box daily_students">'.$students.'</td>
-            <td class="rowcount_'.$ec_counter.' daily_box daily_dob">'.$dateofbirth.'</td>
-            <td class="rowcount_'.$ec_counter.' daily_box daily_login">'.$login_data.'</td>
-            <td class="rowcount_'.$ec_counter.' daily_box daily_week">'.$week_no.$et_code.' - '.$leader_ini.'</td>
-            <td class="rowcount_'.$ec_counter.' daily_box daily_location">'.$location.'</td>
-            <td class="rowcount_'.$ec_counter.' daily_box daily_notes edt_meta" id="edt_meta_'.$edt_id.'">
+            <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_students">'.$students.'</td>
+            <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_dob">'.$dateofbirth.'</td>
+            <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_login">'.$login_data.'</td>
+            <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_week">'.$week_no.$et_code.' - '.$leader_ini.'</td>
+            <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_location">'.$location.'</td>
+            <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_notes edt_meta" id="edt_meta_'.$edt_id.'">
                 <span id = "edt_show_'.$edt_id.'">'.$edt_meta.'</span>
                 <span class="edit_edt_meta" id = "edt_edit_'.$edt_id.'">
                 <textarea id="edt_edit_text_'.$edt_id.'">'.$edt_meta.'</textarea>
@@ -3488,7 +3499,8 @@ if(ca($action) == 'update_waiver_by_id') {
 
     if(in_array($field_name, $allowed_fieldnames)) {
         echo '{"update":"updating!"}';
-        $s_participant_reg -> update_participant_waiver_item($participant_waiver_id, $field_name, $field_val);
+        $result = $s_participant_reg -> update_participant_waiver_item($participant_waiver_id, $field_name, $field_val);
+        echo $result;
     }
 }
 
