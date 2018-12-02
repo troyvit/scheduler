@@ -66,7 +66,7 @@ $has_config=true;
 # $default_class_id=3;
 // $default_class_id=14; // fall 2016
 // $default_class_id=19; // summer 2018
-$default_class_id=20; // fall 2018
+$default_class_id=21; // spring 2019
 
 // login defaults
 // $logout_hours = 24; // after 24 hours you are logged out
@@ -110,11 +110,13 @@ $lang='en';
 // $price['group']=546;
 // $price['group']=286;
 // $price['group']=66;
-$price['group']=390;
+$price['group']=67;
 
-$price['SWM'] = 650; // in db
-$price['FLT'] = 430; // in db
-$price['SFS'] = 650; // in db
+$price['SWM'] = 670; // in db
+$price['FLT'] = 450; // in db
+$price['SFS'] = 670; // in db
+$price['SFS'] = 670; // in db
+$price['SFS'] = 670; // in db
 
 $registration['orig']=0; // cost for registration for first child
 $registration['sibling']=0; // cost for registration for second child
