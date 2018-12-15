@@ -2140,7 +2140,8 @@ class S_participant extends S_login {
             FROM event_participant
             LEFT JOIN event ON event.id = event_participant.event_id
             LEFT JOIN event_type ON event.et_id = event_type.id
-            WHERE event_type.et_activity_level=2';
+            WHERE event_type.et_activity_level=2
+            ORDER BY event_participant.id DESC';
         // debug // echo $query.'<br>';
         if ($result = $this->db->query($query)) {
             return $result;

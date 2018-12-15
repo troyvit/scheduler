@@ -72,7 +72,7 @@ $(document).ready(function() {
                 cb+='<option value="'+data.id+'">'+data.name+'</option>';
             });
                 cb+='<option value="orphans">Show All Orphans</option>';
-                cb+='<option value="privates">Private classes</option>';
+                cb+='<option value="privates">Private lessons</option>';
             $("#classSelect").append(cb);
             $('#classSelect').change(function(e) {
                 billingData.getAllBills(); 

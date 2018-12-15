@@ -17,7 +17,7 @@ require ('includes/head_include.php'); ?>
         size: auto;   /* auto is the initial value */
 
         /* this affects the margin in the printer settings */
-        margin: 17mm 15mm 0mm 0mm !important;
+        margin: 17mm 15mm 0mm 10mm !important;
         border: 3px solid green !important;
     }
 
@@ -42,7 +42,8 @@ require ('includes/head_include.php'); ?>
     }
 
     #hold_daily_schedule .daily_schedule_participant {
-        margin-bottom: 0 !important; // shrink margin because we're hiding dob
+        /* margin-bottom: 0 !important; */
+        /* margin-bottom: 20px !important; */ // 
     }
 
     /* #hold_daily_schedule .daily_box  { font-size: 24px; } */ /* this just doesn't work */
@@ -85,6 +86,7 @@ require ('includes/head_include.php'); ?>
         /* width: 100% !important;
         border-bottom: 1px solid #000000 !important;
         */  
+        margin-bottom: 20px;
     }
 
     h2 { color: #ff0000; }
@@ -94,8 +96,8 @@ require ('includes/head_include.php'); ?>
     #hold_daily_schedule select { display: none; } /* all dropdowns */
     /* .daily_location, .daily_notes { display: none !important; } */ /* hide notes and location */
     .daily_location { display: none !important; } /* hide notes and location */
-    span.phoneitem { display: none; } /* hide phone number */
-    .daily_date_of_birth { display: none; } /* hide dob */
+    span.phoneitem { visibility: hidden; } /* hide phone number */
+    .daily_date_of_birth { visibility: hidden; } /* hide dob */
 
 </style>
 
