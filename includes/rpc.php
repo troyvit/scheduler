@@ -825,6 +825,58 @@ if(ca($action) == 'update_waiver_status') {
     }
 }
 
+if(ca($action) == 'revert_by_log') {
+    $l = new S_logging;
+    $l -> db = $db;
+    $action_id = $_REQUEST['action_id'];
+
+    $l -> restore_by_action($action_id);
+}
+
+if(ca($action) == 'change_group_price_by_class') {
+    // change event prices at the class level
+    // http://troyvit.com/schedule/includes/rpc.php?action=change_group_price_by_class&class_id=21&except_class_types=20
+    $class_id           = $_REQUEST['class_id']; // class id to grab events from
+    $except_class_types = $_REQUEST['except_class_types']; // excepted event types
+    $cost               = $_REQUEST['cost']; // cost to change to
+    $clause             = '';
+    $action_id          = date('U'); // for logging
+
+    if($class_id == '' || $cost == '') {
+        print_r($_REQUEST);
+        echo "{'status':'fail', 'reason':'missing class or cost parameter'}";
+        die();
+    }
+
+    $sb = new S_billing;
+    $sb -> db = $db;
+
+    $l = new S_logging;
+    $l -> db = $db;
+
+    if(strlen($except_class_types) > 0) {
+        $clause = ' AND event.et_id NOT IN ('.$except_class_types.') ';
+    }
+
+    $res = $sb -> event_billing_by_class_with_clause ($class_id, $clause);
+    while($arr = $res -> fetch_assoc()) {
+        // print_r($arr);
+        $log_data['action_id'] = $action_id;
+        $log_data['log_table'] = 'event_participant_billing';
+        $log_data['log_column'] = 'amount_due';
+        $log_data['log_key'] = $arr['id'];
+        $log_data['old_value'] = $arr['amount_due'];
+        $log_data['new_value'] = $cost;
+        $l ->  insert_log_item($log_data); // save the old data
+        $sb -> update_event_participant_billing('amount_due', $cost, $arr['id']);
+        // stuff here
+        // join your ids as a comma separated group
+    }
+
+    echo '<h2>Changed cost to '.$cost.'</h2><h2>Leave this tab open and <a href="/schedule/show_billing.php" target="_new">check your work.</a></h2>
+       <p> If it looks good you are done! If it looks bad click <a href="/schedule/includes/rpc.php?action=revert_by_log&action_id='.$action_id.'" target="_new">here</a> to undo what we just did and call Troy';
+}
+
 if(ca($action) == 'get_billing_list') {
     /* second try here, and so I'm a little pissed. What I should have done
      * was get all logins belonging to a class, then cycled through them

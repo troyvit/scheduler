@@ -77,7 +77,7 @@ $logout_params = array('time'=>'minute', 'increment'=>120);
 $age_month_cutoff=36; // cutoff betweenshowing months and years for age.
 
 // for swimming deposits
-$require_deposit=false; // I DO use this
+// $require_deposit=false; // I DO use this. now it's in the config db
 $deposit_amount = 96.00; // plan to use this anytime troy?
 
 $payment['intrix']['key_id']='3734671';

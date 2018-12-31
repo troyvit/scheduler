@@ -2565,6 +2565,22 @@ class S_billing {
         }
     }
 
+    function event_billing_by_class_with_clause ($class_id, $clause) {
+        //  and event.et_id NOT IN (20)
+        $query = 'SELECT event_participant_billing.*, event_participant.event_id
+            FROM event_participant_billing
+            LEFT JOIN event_participant on event_participant_billing.event_participant_id = event_participant.id  
+            LEFT JOIN event on event_participant.event_id = event.id
+            WHERE event.class_id = '.$class_id.$clause;
+
+        // debug // echo $query;
+        if ($result = $this->db->query($query)) {
+            return $result;
+        } else {
+            return false;
+        }
+    }
+
     function event_billing_by_class($class_id) {
         $query = 'SELECT event_participant_billing.*, event_participant.event_id
             FROM event_participant_billing
@@ -2608,6 +2624,63 @@ class S_logging {
             return true;
         }
         return false;
+    }
+
+    // so that above is for the billing log. this is general auditing stuff
+    function insert_log_item($data) {
+        // debug // print_r($data);
+        extract($data);
+        $query = 'INSERT INTO logging (action_id, log_table, log_column, log_key, old_value, new_value)
+            VALUES ('.$action_id.', "'.$log_table.'", "'.$log_column.'", "'.$log_key.'", "'.$old_value.'", "'.$new_value.'")';
+        // debug // echo $query;
+        if($result = $this->db->query($query)) {
+            return true;
+        }
+        return false;
+    }
+
+    function log_items_by_action ($action_id) {
+        $query = 'SELECT * FROM logging WHERE action_id = "'.$action_id.'"';
+        if ($result = $this->db->query($query)) {
+            while($arr = $result -> fetch_assoc()) {
+                extract($arr);
+                $ret[$id]=$arr;
+            }
+        }
+        return $ret;
+
+    }
+
+    function restore_by_action($action_id) {
+        // this will restore a table to its previous value
+
+        $new_action_id = date('U');
+        $failure = array();
+        $success = array();
+
+        // first get all the items
+        $arr = $this -> log_items_by_action($action_id);
+        foreach($arr as $id => $items) {
+            echo '<pre>';
+            extract($items);
+            $items['action_id'] = $new_action_id; // give it a new id
+            $items['old_value'] = $new_value; // flip the old and new value
+            $items['new_value'] = $old_value; // flip the old and new value
+            print_r($items);
+            $this -> insert_log_item($items); // log what we are trying to do
+            $query = 'UPDATE '.$log_table.' SET '.$log_column.' = "'.$old_value.'" WHERE id = "'.$log_key.'"';
+            echo $query.'<br>';
+            $this -> insert_log_item($items); // log what we are trying to do
+            if($result = $this->db->query($query)) {
+                $success[] = $id;
+                // return true;
+            } else {
+                $failure[] = $id;
+                // return false;
+            }
+        }
+        $ret = array('success' => $success, 'failure' => $failure);
+        return $ret;
     }
 }
 
