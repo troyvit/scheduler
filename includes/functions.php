@@ -598,6 +598,27 @@ class S_event {
         }
     }
 
+    function events_participants_by_date ($participant_ids, $start_date, $days) {
+        // wins the 2019 "best function name" award
+        // participant_ids is an array of participants to allow us to add multiple participants to the search
+        // not implemented on the frontend yet.
+        $query='select event_type.et_name, event_type.et_code, event_daytime.id as edt_id, event_daytime.daytime, location.location, leader.fname as fname, CONCAT (leader.fname, " ", leader.lname) as leader, event.id, event.duration 
+            from event
+            left join leader on event.leader_id=leader.id
+            left join event_daytime on event.id=event_daytime.event_id 
+            left join location on event.location_id=location.id 
+            left join event_type on event.et_id = event_type.id
+            left join event_participant on event.id = event_participant.event_id 
+            WHERE event_daytime.daytime between "'.$start_date.'" and date_add("'.$start_date.'", interval '.$days.' day)
+            AND event_participant.participant_id  in ('.$participant_ids.')';
+        // debug // echo $query.'<br>';
+        if ($result = $this->db->query($query)) {
+            return $result;
+        } else {
+            echo "arg!"; die();
+        }
+    }
+
     function get_surrounding_private_events($private_event_id, $private_event_daytime_id, $datetime) {
         // I can use this to color my events too
         $query = 'SELECT private_event_daytime.id, private_event_daytime.daytime as dt, private_event.duration AS dur
@@ -2041,6 +2062,24 @@ class S_participant extends S_login {
             return $result;
         } else {
             // echo $query.' on line '.__LINE__.'<br>';
+            return false;
+        }
+    }
+
+    function fuzzy_participant_name ($search) {
+        $query = 'SELECT * FROM participant WHERE fname LIKE "%'.$search.'%"
+            OR lname LIKE "%'.$search.'%"
+            ORDER BY fname
+            LIMIT 30';
+            // debug // echo $query."\n";
+        if ($result = $this->db->query($query)) {
+            while($arr = $result -> fetch_assoc()) {
+                extract($arr);
+                $ret[$id]=$arr;
+            }
+            return $ret;
+        } else {
+            echo $query.' on line '.__LINE__.'<br>';
             return false;
         }
     }

@@ -1268,6 +1268,7 @@ if(ca($action)=='get_all_leaders') {
 
 if(ca($action) == 'load_schedule') {
     // load a weekly schedule
+    $by_participants = false;
     $id=$_REQUEST['class_id'];
     $phase = $_REQUEST['phase'];
     $s_class = new S_class($id);
@@ -1295,6 +1296,11 @@ if(ca($action) == 'load_schedule') {
         $by_range = true;
         $start = $_REQUEST['start'];
         $end   = $_REQUEST['end'];
+        $participant_ids = $_REQUEST['participant_ids'];
+
+        if(strlen($participant_ids > 0)) {
+            $by_participants = true;
+        }
         $start_math = strtotime($start);
         $end_math   = strtotime($end);
         $diff  = $end_math - $start_math;
@@ -1350,7 +1356,12 @@ if(ca($action) == 'load_schedule') {
     // echo 'start day name is '.$start_day_name.'<br>';
     // debug // print_r($week); // so week starts on the 8th but your range is starting on 9
     // debug // echo "getting events from $start and for $days <br>";
-    $ret = $s_event -> get_events_in_date_range($start, $days);
+    if($by_participants == false) {
+        $ret = $s_event -> get_events_in_date_range($start, $days);
+    } else {
+        // echo "start is $start and days is $days <br>";
+        $ret = $s_event -> events_participants_by_date ($participant_ids, $start, $days);
+    }
     $i=0;
     while ($events = $ret->fetch_assoc()) {
         $daytime=$events['daytime'];
@@ -3416,6 +3427,25 @@ if(ca($action) == 'get_all_participants_json') {
     $ret=$ret."\n".']';
     echo $ret;
 }
+
+if(ca($action) == 'search_participants_json') {
+    $sp = new S_participant;
+    $sp -> db = $db;
+
+    $participant_filter = $_REQUEST['participant_filter'];
+    $participant_arr = $sp -> fuzzy_participant_name ($participant_filter);
+    foreach($participant_arr as $id => $id_arr) {
+        extract($id_arr);
+        $full_name = "$fname $lname";
+        $id = $id;
+        $clean_arr[$id]['participant_id'] = $id;
+        $clean_arr[$id]['label'] = $full_name;
+    }
+    echo json_encode($clean_arr);
+
+    die();
+}
+
 if(ca($action) == 'get_participants_json') {
     // get all participants for a class returned in a JSON list 
     $s_participant = new S_participant;

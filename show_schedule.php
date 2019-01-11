@@ -366,7 +366,6 @@ var modalActivator = {
                     });
                 });
 
-
             }
         });
     }
@@ -408,11 +407,20 @@ $(document).ready(function() {
             var class_id=$('#classSelect').val();
             var theData="action=load_schedule&class_id="+class_id;
         }
+        if(this.id == 'clearParticipantFilter') {
+            $('#participant_filter').val('');
+            $('#filterParticipantId').val('');
+            $('#scheduleButton').click();
+        }
         if(this.id == 'scheduleButton') {
             var private_classes=true;
             var start=$('#week_start').val();
             var end=$('#week_end').val();
-            var theData="action=load_schedule&sched_type=date_range&start="+start+"&end="+end;
+            var participant_ids = $('#filterParticipantId').val();
+            var theData="action=load_schedule&sched_type=date_range&start="+start+"&end="+end+"&participant_ids="+participant_ids;
+            // expose the participant filter
+            // only show the participant filter if we're doing date ranges because interestingly that's how we find private lessons. I don't think they show up if you pick a class id
+            $('#participant_filter_container').show();
         }
         $.ajax({
             url: "includes/rpc.php",
@@ -497,8 +505,42 @@ $(document).ready(function() {
         class_id=$('#classSelect').val();
     });
 
+    $('#participant_filter').autocomplete({
+        minLength: 3,
+        source: function (request, response) {
+            var participant_filter = $('#participant_filter').val();
+            $.ajax({
+                dataType: "json",
+                type : 'get',
+                url: './includes/rpc.php?action=search_participants_json&participant_filter='+participant_filter,
+                success: function(data) {
+                    response( data );
+                },
+                error: function(data) {
+                    // something brilliant goes here
+                }
+            });
+        },
+        focus: function (event, ui) {
+            $('#participant_filter').val(ui.participant_id);
+            console.log('in focus');
+            console.log(ui.item.participant_id);
+            console.log('^^ that was participant id');
+            // hokay so now we filter the class by participant id
+            return false;
+        },
+        select: function ( event, ui ) {
+            console.log('on select');
+            console.log(ui);
+            $('#filterParticipantId').val(ui.item.participant_id);
+            $('#scheduleButton').click();
+        }
+    });
+    console.log('doc is ready and you shouldve run that autocomplete');
+
     var btn = document.getElementById('emailCopybutton');
     var clipboard = new Clipboard(btn);
+
 
 });
 </script>
@@ -541,6 +583,12 @@ $(document).ready(function() {
     <label for="week_end"><?php echo $sl -> gp('End'); ?></label>
     <input type="text" name="week_end" id="week_end" value="<?php echo $_GET['week_end']; ?>">
     <input type="button" class="scheduleActivator" id="scheduleButton" value="Go!">
+    <span id="participant_filter_container" style="display: none;">
+        <label for="participant_filter"><?php echo $sl -> gp('Filter by student'); ?></label>
+        <input type="text" name="participant_filter" id="participant_filter">
+        <input type="hidden" name="filterParticipantId" id="filterParticipantId">
+    <input type="button" class="scheduleActivator" id="clearParticipantFilter" value="Clear Filter">
+    </span>
 </td>
 <td id="scroll_nav_holder">
     <input type="button" class="scrollArrow" id="goLeft" value="<">
