@@ -4,6 +4,12 @@ ini_set('session.gc_probability', 1);
 session_start();
 require('config.php');
 require('functions.php');
+if($_REQUEST['action'] == '') {
+    if(ca($action) == '') {
+        http_response_code(500);
+        die();
+    }
+}
 // base vars
 $log_level = false;
 
