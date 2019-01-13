@@ -410,9 +410,12 @@ $(document).ready(function() {
         if(this.id == 'clearParticipantFilter') {
             $('#participant_filter').val('');
             $('#filterParticipantId').val('');
+            console.log('about to click');
             $('#scheduleButton').click();
+            console.log('clicked');
         }
         if(this.id == 'scheduleButton') {
+            console.log('this is schedulebutton');
             var private_classes=true;
             var start=$('#week_start').val();
             var end=$('#week_end').val();
@@ -422,82 +425,87 @@ $(document).ready(function() {
             // only show the participant filter if we're doing date ranges because interestingly that's how we find private lessons. I don't think they show up if you pick a class id
             $('#participant_filter_container').show();
         }
-        $.ajax({
-            url: "includes/rpc.php",
-            type: "POST",
-            data: theData,
-            dataType: "html",
-            success: function(result) {
-                $('.scrollArrow').show();
-                $('#scroll_nav_title').show();
-                $('#scroll_nav_holder').show();
-                $('#goRight').mouseup(function(e) {
-                    scheduleManipulator.scootSchedule(this, 430);
-                });
-                $('#goLeft').mouseup(function(e) {
-                    scheduleManipulator.scootSchedule(this, 430);
-                }); // riding wild
-                // populate the page with a schedule
-                $('#hold_schedule').html(result);
+        if(theData !== undefined) {
+            $.ajax({
+                url: "includes/rpc.php",
+                type: "POST",
+                data: theData,
+                dataType: "html",
+                success: function(result) {
+                    console.log('ajax success');
+                    console.log(theData);
+                    console.log('that was the data');
+                    $('.scrollArrow').show();
+                    $('#scroll_nav_title').show();
+                    $('#scroll_nav_holder').show();
+                    $('#goRight').mouseup(function(e) {
+                        scheduleManipulator.scootSchedule(this, 430);
+                    });
+                    $('#goLeft').mouseup(function(e) {
+                        scheduleManipulator.scootSchedule(this, 430);
+                    }); // riding wild
+                    // populate the page with a schedule
+                    $('#hold_schedule').html(result);
 
-                // load the printing function
-                $('.print_day').click(function(e) {
-                    console.log('you clicked me man');
-                    var day = this.id.replace('print_', '');
-                    dailySchedule.day=day;
-                    dailySchedule.showDaily(day, '');
-                });
+                    // load the printing function
+                    $('.print_day').click(function(e) {
+                        console.log('you clicked me man');
+                        var day = this.id.replace('print_', '');
+                        dailySchedule.day=day;
+                        dailySchedule.showDaily(day, '');
+                    });
 
-                // load up the modal
-                $('.time_row').click(function(e) {
-                    // debug // alert('you clicked me');
-                    e.preventDefault();
-                    $('#dateTime').val(this.id);
-                    $('#classId').val($('#classSelect').val());
-                    var class_id=$('#classSelect').val();
-                    var date_time=this.id;
-                    var modalData= "action=get_modal&class_id="+class_id+"&date_time="+date_time;
-                    if(private_classes==true) {
-                        modalActivator.participant_search=true;
-                        var private_start =  $('#week_start').val();
-                        // not sure why this is here // var private_end   =  $('#week_end').val();
-                        // because javascript shits itself if private_end is undefined
-                        var private_end   =  $('#week_end').val();
-                        modalData=modalData+"&private_classes=true&private_start="+private_start+"&private_end="+private_end;
-                        participantData.participantSearchFieldLocation='private_participant';
+                    // load up the modal
+                    $('.time_row').click(function(e) {
+                        // debug // alert('you clicked me');
+                        e.preventDefault();
+                        $('#dateTime').val(this.id);
+                        $('#classId').val($('#classSelect').val());
+                        var class_id=$('#classSelect').val();
+                        var date_time=this.id;
+                        var modalData= "action=get_modal&class_id="+class_id+"&date_time="+date_time;
+                        if(private_classes==true) {
+                            modalActivator.participant_search=true;
+                            var private_start =  $('#week_start').val();
+                            // not sure why this is here // var private_end   =  $('#week_end').val();
+                            // because javascript shits itself if private_end is undefined
+                            var private_end   =  $('#week_end').val();
+                            modalData=modalData+"&private_classes=true&private_start="+private_start+"&private_end="+private_end;
+                            participantData.participantSearchFieldLocation='private_participant';
 
-                    }
-                    modalActivator.openModal(modalData);
-                 });
-                $('.event_daily_display').click(function(e) {
-                    // check to see if they clicked on a group event or a private event
-                    var ndateTime=$(this).parent().parent().attr("id");
-                    $('#dateTime').val(ndateTime); // used in myModal
+                        }
+                        modalActivator.openModal(modalData);
+                     });
+                    $('.event_daily_display').click(function(e) {
+                        // check to see if they clicked on a group event or a private event
+                        var ndateTime=$(this).parent().parent().attr("id");
+                        $('#dateTime').val(ndateTime); // used in myModal
 
-                    var fullClassName=$(this).attr('class');
-                    if(fullClassName.indexOf('private_event') > 0) {
-                        // private class
-                        var id_hash_arr=this.id.split(':');
-                        var private_event_id=id_hash_arr[0];
-                        var private_event_daytime_id=id_hash_arr[1];
-                        var action = 'get_private_event';
-                        var private_start =  $('#week_start').val();
-                        var private_end   =  $('#week_end').val();
-                        var modalData="action=get_private_event&private_start="+private_start+"&private_end="+private_end+"&private_event_id="+private_event_id+"&private_event_daytime_id="+private_event_daytime_id+"&date_time="+ndateTime; // just ... WOW. 
-                        participantData.participantSearchFieldLocation='private_participant';
-                        modalActivator.participant_search=true;
-                    } else {
-                        var event_id=this.id;
-                        var edt_id = $(this).find(".cascade_edt_id").val();
-			console.log(edt_id);
-                        var modalData="action=get_event&event_id="+event_id+"&date_time="+ndateTime+"&edt_id="+edt_id; 
-                    }
-                    /* var modalData= "action=get_modal&class_id="+class_id+"&date_time="+ndateTime; */
-                    modalActivator.openModal(modalData);
-                    e.stopPropagation();
-                });
-            }
-        });
+                        var fullClassName=$(this).attr('class');
+                        if(fullClassName.indexOf('private_event') > 0) {
+                            // private class
+                            var id_hash_arr=this.id.split(':');
+                            var private_event_id=id_hash_arr[0];
+                            var private_event_daytime_id=id_hash_arr[1];
+                            var action = 'get_private_event';
+                            var private_start =  $('#week_start').val();
+                            var private_end   =  $('#week_end').val();
+                            var modalData="action=get_private_event&private_start="+private_start+"&private_end="+private_end+"&private_event_id="+private_event_id+"&private_event_daytime_id="+private_event_daytime_id+"&date_time="+ndateTime; // just ... WOW. 
+                            participantData.participantSearchFieldLocation='private_participant';
+                            modalActivator.participant_search=true;
+                        } else {
+                            var event_id=this.id;
+                            var edt_id = $(this).find(".cascade_edt_id").val();
+                console.log(edt_id);
+                            var modalData="action=get_event&event_id="+event_id+"&date_time="+ndateTime+"&edt_id="+edt_id; 
+                        }
+                        /* var modalData= "action=get_modal&class_id="+class_id+"&date_time="+ndateTime; */
+                        modalActivator.openModal(modalData);
+                        e.stopPropagation();
+                    });
+                }
+            });
+        }
     });
 
         $('#classSelect').change(function(e) {
