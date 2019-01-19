@@ -411,7 +411,7 @@ $(document).ready(function() {
             $('#participant_filter').val('');
             $('#filterParticipantId').val('');
             console.log('about to click');
-            $('#scheduleButton').click();
+            $('#scheduleButton').trigger('click');
             console.log('clicked');
         }
         if(this.id == 'scheduleButton') {
