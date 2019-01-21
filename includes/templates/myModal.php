@@ -87,6 +87,25 @@
 
 </td>
             </tr>
+            <?php if(isset($event_id)) { ?>
+                <tr>
+                <td><?php echo $sl->gp('week number'); ?></td><td><input type="text" class="small_number_text" name="attendance" id="attendance" value="<?php echo $weeks_plus_attendance; ?>" > / <?php echo $total_weeks; ?>
+                    <input type="hidden" name="bak_attendance" id="bak_attendance" value="<?php echo $weeks_plus_attendance; ?>" >
+                    <input type="hidden" name="week_no" id="week_no" value="<?php echo $week_no; ?>" > <!-- base week number before taking attendance into account -->
+                    <?php if($attendance != 0) {
+                        echo '<p>Attendance has been adjusted by '.$attendance.'.</p>';
+                    } ?>
+
+</td>
+                </tr>
+            <?php 
+            
+                    if($et_activity_level == 2) {
+                        // private class; save the event_participant_id
+                        echo '<input type="hidden" name="event_participant_id" id="event_participant_id" value="'.$event_participant_id.'" >';
+                    }
+            
+} ?>
             <tr>
             <td><?php echo $sl->gp('number of students'); ?></td><td><input type="text" class="small_number_text" name="number_participants" id="number_participants" value="<?php echo $number_participants; ?>" ></td>
             </tr>

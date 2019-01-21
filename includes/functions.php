@@ -443,8 +443,8 @@ class S_class {
                 // daily class, assume it's a private
                 $dsp_arr = config::config_option('default_selected_privates');
                 $default_selected_privates = json_decode($dsp_arr['option_value']);
-                print_r($default_selected_privates);
-                echo "num_day_of_week is $num_day_of_week \n";
+                // print_r($default_selected_privates);
+                // echo "num_day_of_week is $num_day_of_week \n";
                 if(!in_array($num_day_of_week, $default_selected_privates)) {
                     echo "toinsert is false\n";
                     $toinsert = false;
@@ -2258,11 +2258,12 @@ class S_participant extends S_login {
     }
 
     function update_event_participant ($field_name, $field_val, $ep_id) {
-        $allowed_fields=array('event_id','status_id');
+        $allowed_fields=array('event_id','status_id', 'attendance');
         if(in_array($field_name, $allowed_fields)) {
             $query = 'UPDATE event_participant SET '.$field_name.' = "'.$field_val.'" 
                 WHERE id='.$ep_id;
-            // debug // echo $query."\n";
+            // debug // 
+            echo $query."\n";
             if ($result = $this->db->query($query)) {
                 $participant_id=$this->db->insert_id;
                 return $participant_id;

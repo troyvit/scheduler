@@ -1727,7 +1727,8 @@ if(ca($action) == 'daily_schedule') {
                 foreach($ep_arr as $ep_id => $epa) {
                     // print_r($epa);
                     $participant_id = $epa['participant_id'];
-                    $name = $epa['fname'].' '.$epa['lname'];
+                    $name           = $epa['fname'].' '.$epa['lname'];
+                    $attendance     = $epa['attendance'];
                     // $age = ceil($epa['participant_age_months']/12);
                     $age = $epa['participant_age_months'];
                     $dob = $epa['dob'];
@@ -1793,12 +1794,13 @@ if(ca($action) == 'daily_schedule') {
                     // debug // echo "the start is $start and now is $now for $event_id<br>";
                     $week_no     = datediffInWeeks($start, $now);
                     $total_weeks = datediffInWeeks($start, $end);
+                    $weeks_plus_attendance = $week_no + $attendance;
                     if($week_no == 0) {
                         // day 1 of the class I guess?
                         $week_no = 1;
                     }
                     // $week_no = "$week_no/$total_weeks";
-                    $week_no = "$week_no/"; // combines with # weeks attached to classname now
+                    $week_no = "$weeks_plus_attendance/"; // combines with # weeks attached to classname now
                 } else {
                     $week_no = "N/A";
                 }
@@ -2378,13 +2380,17 @@ if(ca($action) == 'get_event') {
     $et_arr = $et_res -> fetch_assoc();
     $et_activity_level = $et_arr['et_activity_level'];
 
-    if($et_activity_level == 2) { // private class. grab the student
+    if($et_activity_level == 2) { // private class. grab the student, etc.
         $ep_res = $s_participant -> participants_in_event($event_id);
         $ep_arr = $ep_res -> fetch_assoc();
-        print_r($ep_arr);
+        // print_r($ep_arr);
         // sort out some variables to align the php with the javascript (because I am afraid of the javascript)
         $start = $arr['start'];
         $end   = $arr['end'];
+        // you have start and you have end but DO YOU HAVE THE NOW.
+        $day = date('Y-m-d', $date_time);
+        $date_obj = new DateTime($day);
+        $now = $date_obj -> format('Y-m-d H:i:s');
 
         $ps_date = DateTime::createFromFormat('Y-m-d H:i:s', $start);
         $pe_date = DateTime::createFromFormat('Y-m-d H:i:s', $end);
@@ -2393,7 +2399,13 @@ if(ca($action) == 'get_event') {
         $private_end   = $pe_date -> format('Y-m-d');
 
         $private_participant_id = $ep_arr['participant_id'];
-        $private_participant = $ep_arr['fname'].' '.$ep_arr['lname'];
+        $private_participant    = $ep_arr['fname'].' '.$ep_arr['lname'];
+        $attendance             = $ep_arr['attendance'];
+        $event_participant_id   = $ep_arr['event_participant_id'];
+        $week_no     = datediffInWeeks($start, $now);
+        $total_weeks = datediffInWeeks($start, $end);
+        $weeks_plus_attendance = $week_no + $attendance;
+        echo "start is $start and now is $now and week_no is $week_no and attendance is $attendance so wpa is $weeks_plus_attendance <br>";
     }
 
     $event_result_again = $s_event -> get_all_event_types();
@@ -3218,16 +3230,44 @@ if(ca($action) == 'edit_event') {
     $s_event -> db = $db;
     $s_participant = new S_participant;
     $s_participant -> db = $db;
+
     $s_event -> event_id=$_REQUEST['event_id'];
+
     // debug // print_r($_REQUEST);
-    $data['class_id']=$_REQUEST['class_id'];
-    $data['location_id']=$_REQUEST['location_id'];
-    $data['leader_id']=$_REQUEST['leader_id'];
-    $data['et_id']=$_REQUEST['event_type']; // change event_type to et_id man
-    $data['duration']=$_REQUEST['duration'];
-    $data['number_participants']=$_REQUEST['number_participants'];
+    $data['class_id']              = $_REQUEST['class_id'];
+    $data['location_id']           = $_REQUEST['location_id'];
+    $data['leader_id']             = $_REQUEST['leader_id'];
+    $data['et_id']                 = $_REQUEST['event_type']; // change event_type to et_id man
+    $data['duration']              = $_REQUEST['duration'];
+    $data['number_participants']   = $_REQUEST['number_participants'];
+
     $edt_meta = $_REQUEST['edt_meta'];
-    $edt_id = $_REQUEST['edt_id'];
+    $edt_id   = $_REQUEST['edt_id'];
+
+
+    $et_activity_level = $_REQUEST['et_activity_level'];
+
+    echo "about to check et_activity_level \n";
+    if($et_activity_level == 2) {
+        echo "yay it is 2 and we have a private class \n";
+        // private class
+        $participant_id       = $_REQUEST['private_participant_id'];
+        $event_participant_id = $_REQUEST['event_participant_id'];
+        $attendance           = $_REQUEST['attendance'];
+        $bak_attendance       = $_REQUEST['bak_attendance'];
+        $week_no              = $_REQUEST['week_no'];
+
+        $new_attendance = $attendance - $week_no;
+
+        echo "$attendance minus $week_no equals $new_attendance\n";
+
+        $up = $s_participant -> update_event_participant('attendance', $new_attendance, $event_participant_id);
+        // let's see if we are adjusting week numbers
+    } else {
+        echo "sorry, no et_activity level! \n";
+        print_r($_REQUEST);
+    }
+
     $result = $s_event -> edit_event($data);
     $result = $s_event -> update_event_daytime_meta($edt_id, $edt_meta);
 }
@@ -3266,8 +3306,7 @@ if(ca($action) == 'add_class') {
     $data['end']                    = $_REQUEST['private_end'];
     $data['private_participant_id'] = $_REQUEST['private_participant_id'];
 
-    echo '<pre>';
-    print_r($data);
+    // echo '<pre>'; print_r($data);
 
     
     $s_class = new S_class($data['class_id']);

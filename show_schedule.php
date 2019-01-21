@@ -118,6 +118,11 @@ var jsConfigs = {
     rpc: 'includes/rpc.php'
 }
 
+function checkVisible(elm) {
+      var rect = elm.getBoundingClientRect();
+        var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+        return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+}
 var scheduleManipulator = {
     scootSchedule: function(arrowButton, distance) {
         var of=$('#schedule').offset();
@@ -546,8 +551,11 @@ $(document).ready(function() {
     });
     console.log('doc is ready and you shouldve run that autocomplete');
 
+    /*
     var btn = document.getElementById('emailCopybutton');
+    console.log('btn is '+btn);
     var clipboard = new Clipboard(btn);
+     */
 
 
 });
