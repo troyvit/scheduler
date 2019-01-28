@@ -3222,7 +3222,37 @@ if(ca($action) == 'delete_event') {
     $s_event = new S_event;
     $s_event -> db = $db;
     $s_event -> event_id=$_REQUEST['event_id'];
+
+    $event_id = $_REQUEST['event_id'];
+
+    $s_participant = new S_participant;
+    $s_participant -> db = $db;
+
+    $s_billing = new S_billing;
+    $s_billing -> db = $db;
+
+    // get all participants in the event
+    $ep_res = $s_participant -> participants_in_event($event_id);
+    $ep_arr=result_as_array(new serialized_Render(), $ep_res, 'participant_id');
+    // store the event_participant_id in an array
+    if(is_array($ep_arr)) {
+        foreach($ep_arr as $ek => $es) {
+            $event_participant_ids[] = $es['event_participant_id'];
+        }
+    }
+
+    if(is_array($event_participant_ids)) {
+        print_r($event_participant_ids);
+        // delete all records from billing table
+        $ep_ids_del = implode(',', $event_participant_ids);
+        $success = $s_billing -> remove_event_participant_billing($ep_ids_del);
+    }
+
+    echo '<br>success is '+$success.'<br>';
+
+    // now delete the actual event
     $s_event -> delete_event();
+
 }
 
 if(ca($action) == 'edit_event') {

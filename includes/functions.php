@@ -844,6 +844,7 @@ class S_event {
         $query='delete from event_daytime where event_id='.$this->event_id;
         $result = $this->db->query($query);
         $query='delete from event_participant where event_id='.$this->event_id;
+
         // you need to delete from event_participant_billing and its line items as well
 	// get all event_participant_ids from event_participant based on this-> event_id
 	// look on line 2026: s_participant -> participants_in_event($event_id).
@@ -2583,13 +2584,15 @@ class S_billing {
     function remove_event_participant_billing ($event_participant_id) {
         // this blows up if you have the same event_participant_id in 2 places
         // which sounds totally insane
-        $query='DELETE FROM event_participant_billing WHERE event_participant_id = '.$event_participant_id;
-        // debug // echo $query.'<br>';
+        // yeah I'm saying that is impossible
+        $query='DELETE FROM event_participant_billing WHERE event_participant_id in('.$event_participant_id.')';
+        // debug // 
+        echo $query.'<br>';
         $result = $this->db->query($query);
         if(is_object($result)) {
             return true;
         } else {
-            echo $query;
+            return false;
         }
     }
 
