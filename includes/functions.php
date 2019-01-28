@@ -839,18 +839,15 @@ class S_event {
     }
 
     function delete_event() {
+        // billing info is deleted from a separate function for a few reasons, some good some bad.
+
         $query='delete from event where id='.$this->event_id;
         $result = $this->db->query($query);
         $query='delete from event_daytime where event_id='.$this->event_id;
         $result = $this->db->query($query);
         $query='delete from event_participant where event_id='.$this->event_id;
-
-        // you need to delete from event_participant_billing and its line items as well
-	// get all event_participant_ids from event_participant based on this-> event_id
-	// look on line 2026: s_participant -> participants_in_event($event_id).
-	// it gets you the event_participant_ids. You can delete from event_participant_billing based on those.
-	// then build a delete with an in() to make it a little faster.
         // you need to learn foreign keys buddy
+
         $result = $this->db->query($query);
         return $result;
     }
