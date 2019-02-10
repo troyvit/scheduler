@@ -3286,6 +3286,11 @@ if(ca($action) == 'edit_event') {
         $attendance           = $_REQUEST['attendance'];
         $bak_attendance       = $_REQUEST['bak_attendance'];
         $week_no              = $_REQUEST['week_no'];
+        $private_start        = $_REQUEST['private_start'];
+        $private_end          = $_REQUEST['private_end'];
+
+        // compare the private_start and private_end to what is in the event. update if they are different.
+        //
 
         $new_attendance = $attendance - $week_no;
 
