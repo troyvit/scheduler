@@ -11,6 +11,7 @@
         <table class="class_edit">
             <tr><td colspan="2" style="text-align: center; font-weight: bold; "><?php echo $now_dayname.' '.$now_date_display; ?></td></tr>
             <tr><td>Time</td><td>
+            <?php if(is_array($dropdown_time)) { ?>
                 <select name="event_time" id="event_time">
                     <?php
                     foreach($dropdown_time as $time) {
@@ -23,7 +24,7 @@
                     }
                     ?>
                 </select>
-                <?php /* echo $event_time; */ ?>
+                <?php } else { echo $event_time; } ?>
             </td></tr>
         <?php if($class_dropdown==false) { ?>
             <input type="hidden" id="classId" name="class_id" value="<?php echo $class_id; ?>">
