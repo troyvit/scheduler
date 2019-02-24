@@ -2371,26 +2371,33 @@ if(ca($action) == 'get_event') {
 
     $event_id     = $_REQUEST['event_id'];
     $date_time    = $_REQUEST['date_time'];
+    $edt_id       = $_REQUEST['edt_id'];
     $event_time   = date('g:i A', $date_time);
     $event_result = $s_event -> get_event($event_id);
     $arr          = $event_result -> fetch_assoc();
+
+    $start = $arr['start'];
+    $end   = $arr['end'];
 
     // get the event type to see if it's a private
     $et_res = $s_event->get_event_type_by_id($arr['et_id']);
     $et_arr = $et_res -> fetch_assoc();
     $et_activity_level = $et_arr['et_activity_level'];
+    echo "up here activity levle is $et_activity_level <br>\n";
 
     if($et_activity_level == 2) { // private class. grab the student, etc.
         $ep_res = $s_participant -> participants_in_event($event_id);
         $ep_arr = $ep_res -> fetch_assoc();
         // print_r($ep_arr);
         // sort out some variables to align the php with the javascript (because I am afraid of the javascript)
-        $start = $arr['start'];
-        $end   = $arr['end'];
         // you have start and you have end but DO YOU HAVE THE NOW.
         $day = date('Y-m-d', $date_time);
         $date_obj = new DateTime($day);
         $now = $date_obj -> format('Y-m-d H:i:s');
+        $now_date_display = $date_obj -> format('Y-m-d');
+
+        // get the day name for now
+        $now_dayname = $date_obj -> format('l');
 
         $ps_date = DateTime::createFromFormat('Y-m-d H:i:s', $start);
         $pe_date = DateTime::createFromFormat('Y-m-d H:i:s', $end);
@@ -2407,7 +2414,8 @@ if(ca($action) == 'get_event') {
         $weeks_plus_attendance = $week_no + $attendance;
         echo "start is $start and now is $now and week_no is $week_no and attendance is $attendance so wpa is $weeks_plus_attendance <br>";
     }
-
+    // I have a variable conflict and am solving it in a stupid way
+    $current_et_activity_level = $et_activity_level;
     $event_result_again = $s_event -> get_all_event_types();
     while($ev_arr = $event_result_again -> fetch_assoc()) {
         $event_type_id = $ev_arr['id'];
@@ -2416,20 +2424,54 @@ if(ca($action) == 'get_event') {
         $et_name = $ev_arr['et_name'];
         $et_json_arr[$event_type_id] = $ev_arr;
     }
+    // put the activity level back
+    $et_activity_level = $current_et_activity_level;
+    echo "and now activity level is $et_activity_level <br>\n";
     $et_json = urlencode(json_encode($et_json_arr));
 
 
-    $edt_id = $_REQUEST['edt_id'];
     if(is_int($edt_id * 1)) {
         // we have an event daytime. get all its data
         $edt_result = $s_event -> get_event_daytime($edt_id);
         $edt_data   = $edt_result ->fetch_assoc();
+
+        // get all the event daytimes
+
         // debug // print_r($edt_data);
         // all I care about for now is the metadata
         $edt_meta = $edt_data['edt_meta'];
     } else {
         // echo "well it isn't an int sothere <br>";
     }
+
+    $edt_arr = $s_event -> get_all_event_daytimes($event_id);
+    
+    echo "how many event daytimes do we have? <br>";
+    $number_of_events = count($edt_arr);
+    echo $number_of_events;
+    echo "<br>we have that many!";
+    echo "start is $start and end is $end!<br>";
+    if(isset($start) && isset($end)) {
+        $total_days_arr = betterDateDiff($start, $end);
+        $total_days = $total_days_arr['days'];
+        // $total_weeks = $total_days/7;
+        $total_weeks = $total_days_arr['weeks'];
+        if($total_weeks < $number_of_events) {
+            // this is so half-ass
+            // if total_weeks < number_of_events then that means
+            // we have > 1 event per week, which means that I am 
+            // calling this a daily class
+            // so this doesn't take into account stuff like every other day classes
+            $occurance_rate = 'daily';
+        } else {
+            $occurance_rate = 'weekly';
+        }
+    }
+
+    /*
+    echo "<br> and we have $total_days to compare with  by working with $start and $end<br>";
+    echo "btw we are in get_event <br> and that is good";
+     */
 
     // extract $arr and populate your defaults with its results
     extract($arr); // ugh why is this down here
@@ -2443,8 +2485,23 @@ if(ca($action) == 'get_event') {
     $event_result = $s_event -> get_all_event_types();
     $event_list = result_as_html_list(new html_Render(), $event_result, 'id', 'event', $et_id);
 
-    require('templates/myModal.php');
+    // prepare the modal dropdown for the time
 
+    $dd_start_time = "$daily_start_hour$daily_start_minute"; 
+    $dd_end_time =   "$daily_end_hour$daily_end_minute"; 
+
+    $dd_s = DateTime::createFromFormat('Gi', $dd_start_time);
+    $dd_e = DateTime::createFromFormat('Gi', $dd_end_time);
+
+    if($dd_s < $dd_e) {
+        while($dd_s < $dd_e) {
+            $dropdown_time[] = $dd_s -> format('g:i A');
+            $dd_s -> modify('+ '.$daily_schedule_time_constraint.' minute');
+        }
+    } 
+    // print_r($dropdown_time);
+
+    require('templates/myModal.php');
 }
 
 if(ca($action) == 'get_class_nav') {
@@ -3256,12 +3313,19 @@ if(ca($action) == 'delete_event') {
 }
 
 if(ca($action) == 'edit_event') {
+
     $s_event = new S_event;
     $s_event -> db = $db;
     $s_participant = new S_participant;
     $s_participant -> db = $db;
 
     $s_event -> event_id=$_REQUEST['event_id'];
+
+    // for if you change participants
+    $s_billing = new S_billing;
+    $s_billing -> db = $db;
+
+    $event_id = $_REQUEST['event_id']; // I was such a stupid child
 
     // debug // print_r($_REQUEST);
     $data['class_id']              = $_REQUEST['class_id'];
@@ -3271,40 +3335,176 @@ if(ca($action) == 'edit_event') {
     $data['duration']              = $_REQUEST['duration'];
     $data['number_participants']   = $_REQUEST['number_participants'];
 
-    $edt_meta = $_REQUEST['edt_meta'];
-    $edt_id   = $_REQUEST['edt_id'];
+    $occurance_rate                = $_REQUEST['occurance_rate'];
 
+    $edt_meta       = $_REQUEST['edt_meta'];
+    $edt_id         = $_REQUEST['edt_id'];
+    $event_time     = urldecode($_REQUEST['event_time']);
+    $bak_event_time = urldecode($_REQUEST['bak_event_time']);
+    $et_obj         = DateTime::createFromFormat('g:i a', $event_time);
 
     $et_activity_level = $_REQUEST['et_activity_level'];
 
-    echo "about to check et_activity_level \n";
+    $change_event_daytime = false;
+
     if($et_activity_level == 2) {
         echo "yay it is 2 and we have a private class \n";
         // private class
-        $participant_id       = $_REQUEST['private_participant_id'];
-        $event_participant_id = $_REQUEST['event_participant_id'];
-        $attendance           = $_REQUEST['attendance'];
-        $bak_attendance       = $_REQUEST['bak_attendance'];
-        $week_no              = $_REQUEST['week_no'];
-        $private_start        = $_REQUEST['private_start'];
-        $private_end          = $_REQUEST['private_end'];
+        $participant_id        = $_REQUEST['private_participant_id'];
+        $bak_participant_id    = $_REQUEST['bak_private_participant_id'];
+        $event_participant_id  = $_REQUEST['event_participant_id'];
+        $attendance            = $_REQUEST['attendance'];
+        $bak_attendance        = $_REQUEST['bak_attendance'];
+        $week_no               = $_REQUEST['week_no'];
+        $private_start         = $_REQUEST['private_start'];
+        $private_end           = $_REQUEST['private_end'];
 
-        // compare the private_start and private_end to what is in the event. update if they are different.
-        //
+        // get the hidden start and end fields and compare them to 
+        // what is in the text fields. less error prone than 
+        // comparing 2 objects I hope
+        $bak_private_start     = $_REQUEST['bak_private_start'];
+        $bak_private_end       = $_REQUEST['bak_private_end'];
+
+        // store start and end for updating the event
+        $data['private_start'] = $_REQUEST['private_start'];
+        $data['private_end']   = $_REQUEST['private_end'];
 
         $new_attendance = $attendance - $week_no;
 
         echo "$attendance minus $week_no equals $new_attendance\n";
 
         $up = $s_participant -> update_event_participant('attendance', $new_attendance, $event_participant_id);
-        // let's see if we are adjusting week numbers
-    } else {
-        echo "sorry, no et_activity level! \n";
-        print_r($_REQUEST);
+
+        if($participant_id != $bak_participant_id) {
+            // we changed participants
+            // get event_participant and event_participant_billing
+        }
+
     }
+
 
     $result = $s_event -> edit_event($data);
     $result = $s_event -> update_event_daytime_meta($edt_id, $edt_meta);
+
+    // see if we are updating event weeks
+    // also see if we're updating event time. need to look at those together
+    // also -- always keep event.start and the minimum of event.daytime synced.
+
+    $event_res = $s_event -> better_get_event($event_id);
+    $event_data = $event_res->fetch_assoc();
+
+    // event details as seen in the database
+    $first_event_daytime = new DateTime($event_data['first_event_daytime']);
+    $last_event_daytime  = new DateTime($event_data['last_event_daytime']);
+    $event_start         = new DateTime($event_data['event_start']);
+    $event_end           = new DateTime($event_data['event_end']);
+
+    // event details as passed from the form
+    $ps_obj = new DateTime($private_start);
+    $pe_obj = new DateTime($private_end);
+
+    /*
+    echo "events:\n";
+    print_r($event_start);
+    print_r($event_end);
+
+    echo "what was sent:\n";
+    print_r($ps_obj);
+    print_r($pe_obj);
+     */
+
+    if($event_time != $bak_event_time) {
+        $change_event_daytime = true;
+        echo "event_time is $event_time and db has ".$event_data['event_time']."\n";
+        echo "db obj:\n";
+        print_r($db_event_time);
+
+        echo "submitted obj\n";
+        print_r($et_obj);
+        $change_event_daytime = true;
+    }
+
+    if($private_start != $bak_private_start) {
+        echo "private_start is $private_start and bak_private_start is $bak_private_start\n";
+        $change_event_daytime = true;
+    }
+
+    if($private_end != $bak_private_end) {
+        $change_event_daytime = true;
+    }
+
+    if($change_event_daytime == true) {
+        // get any existing events with metadata in them
+        // and save them indexed by event_id and event_daytime
+        $edt_arr = $s_event -> event_daytimes_with_meta($event_id);
+        print_r($edt_arr);
+        echo "those are the metas we found ^^ \n";
+        if(is_array($edt_arr) && count($edt_arr) > 0) {
+            if(count($edt_arr) < 3) {
+                echo "\n";
+                echo count($edt_arr);
+                print_r($edt_arr);
+                echo "\n";
+                echo "re-running\n";
+                $edt_arr2 = $s_event -> event_daytimes_with_meta($event_id);
+                print_r($edt_arr2);
+
+                die('you were supposed to have 3!');
+            }
+            foreach($edt_arr as $id => $edt_item_arr) {
+                $id       = $edt_item_arr['id'];
+                $event_id = $edt_item_arr['event_id'];
+                $daytime  = $edt_item_arr['daytime'];
+                $dt_obj   = new DateTime($daytime);
+                $edt_date = $dt_obj->format('Y-m-d');
+                $edt_meta = $edt_item_arr['edt_meta'];
+                echo "adding $edt_meta to $event_id [ $edt_date ]\n";
+                $metasave[$event_id][$edt_date] = $edt_meta;
+            }
+        }
+
+        echo "these are the metasaves!\n";
+        print_r($metasave);
+        echo "those were the metasaves!\n";
+
+        // delete the current events
+        $res = $s_event -> delete_event_daytime_by_event($event_id);
+
+        // find out how many inserts we're doing
+        $event_increment_number = json_decode($myconfig['event_increment_number']['option_value'],true);
+        $inc_num = $event_increment_number[$occurance_rate];
+        /*
+        echo "occurance_rate is $occurance_rate and inc_num is $inc_num because of this: \n";
+        print_r($event_increment_number);
+        echo "which is because of this\n";
+        print_r($myconfig);
+         */
+        $dsp_arr = $myconfig['default_selected_privates'];
+        $default_selected_privates = json_decode($dsp_arr['option_value']);
+        // loop through the new days
+        while($ps_obj <= $pe_obj) {
+            $num_day_of_week = $ps_obj -> format('w');
+
+            // debug // echo "day of week is $num_day_of_week\n";
+            if(in_array($num_day_of_week, $default_selected_privates)) {
+                $edt_ins_date   = $ps_obj -> format('Y-m-d');
+                echo "looking in metadata based on $event_id and $edt_ins_date\n";
+                echo $metasave[$event_id][$edt_ins_date];
+                echo "\nAnything?\n";
+                $edt_time   = $et_obj -> format('G:i');
+                $dt_for_ins = "$edt_ins_date $edt_time";
+                $edt_meta   = $metasave[$event_id][$edt_ins_date];
+                // echo "insert this bad boy";
+                $s_event -> insert_event_daytime($event_id, $dt_for_ins, $edt_meta);
+            }
+            /*
+            echo "this is the date object you're working with \n";
+            print_r($ps_obj);
+            echo "this was the date object you're working with \n";
+             */
+            $ps_obj -> modify('+'.$inc_num.' day');
+        }
+    }
 }
 
 if(ca($action) == 'toggle_participant_status') {

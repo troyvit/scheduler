@@ -11,6 +11,15 @@ require ('includes/head_include.php'); ?>
 </style>
 
 <style type="text/css"  media="print">
+/* for when we replace reveal.js */
+/*
+#myModal {
+    position:absolute;
+    background-color: #dedede;
+    left: 0;
+    top: 0;
+}
+*/
     /* fixes for printing */
     @page
     {
@@ -249,6 +258,9 @@ var dailySchedule = {
 }
 
 var modalActivator = {
+    myreveal: function(id) {
+        $('#'+id).show();
+    },
     participant_search: true,
     openModal: function( data ) {
         $.ajax({
@@ -268,6 +280,7 @@ var modalActivator = {
                     $('#myModal').tabs();
                     $('#day_boxes').buttonset();
                     $('#myModal').reveal();
+                    // modalActivator.myreveal('myModal');
                 }
                 // this is wrong and bad. I should use a callback for it.
                 $('#private_start').datepicker({ dateFormat: "yy-mm-dd" });

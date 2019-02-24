@@ -472,6 +472,7 @@ class S_class {
         return $event_id;
     }
 
+
     function test_func() {
         // test getting all config options from another class
         /*
@@ -486,6 +487,8 @@ class S_class {
     function increment_number($occurance_rate) {
         // maybe this needs to be in config
         // yeah like the new config table I just built
+        // well it at least belongs in s_event and not s_class
+        // added to config on 2019-02-19
         $day_inc=array('daily'=>1,'weekly'=>7,'every other day'=>2);
         return $day_inc[$occurance_rate];
     }
@@ -694,7 +697,11 @@ class S_event {
            DAYNAME(min(event_daytime.daytime)) 
             AS event_day, 
             DATE_FORMAT(min(event_daytime.daytime), "%l:%i %p") as event_time,
-            event_daytime.daytime, event.class_id, event.location_id, event.leader_id, event.et_id, location.location, leader.fname, event.id, event.duration, event.number_participants
+            min(event_daytime.daytime) as first_event_daytime,
+            max(event_daytime.daytime) as last_event_daytime,
+            event_daytime.daytime, event.class_id, event.location_id, event.leader_id, event.et_id, location.location, leader.fname, event.id, event.duration, event.number_participants,
+            event.start as event_start,
+            event.end as event_end
             from event left join leader on event.leader_id=leader.id 
             left join event_daytime on event.id=event_daytime.event_id 
             left join location on event.location_id=location.id 
@@ -852,14 +859,47 @@ class S_event {
         return $result;
     }
 
+    function delete_event_daytime_by_event($event_id) {
+        $query='delete from event_daytime where event_id='.$event_id;
+        $result = $this->db->query($query);
+        return $result;
+    }
+
+    function insert_event_daytime($event_id, $daytime, $edt_meta) {
+        $query = 'INSERT INTO event_daytime(event_id, daytime, edt_meta)
+            VALUES ('.$event_id.', "'.$daytime.'", "'.$edt_meta.'")';
+        echo $query."<br>";
+        $result = $this->db->query($query);
+        /*
+        echo "result is \n";
+        print_r($result);
+         */
+        if($result == true) {
+            $success = true;
+        } else {
+            $success = false;
+        }
+        return $success;
+    }
+
     function edit_event($data) {
+        $sq = '';
+        $eq = '';
         extract($data);
+        print_r($data);
+        if(strlen($private_start) > 0) {
+            $sq = 'start = "'.$private_start.'",';
+        }
+        if(strlen($private_end) > 0) {
+            $eq = 'end = "'.$private_end.'",';
+        }
         $query='UPDATE event set 
             class_id='.$class_id.', 
             location_id='.$location_id.',
             leader_id='.$leader_id.',
             et_id='.$et_id.',
             duration='.$duration.',
+            '.$sq.' '.$eq.' 
             number_participants='.$number_participants.'
             WHERE id='.$this->event_id;
         // debug // 
@@ -943,6 +983,20 @@ class S_event {
         return false;
     }
 
+    function get_all_event_daytimes($event_id) {
+        // how can I not have this function yet?
+        $query='SELECT * FROM event_daytime WHERE event_id='.$event_id;
+        // debug // echo $query.'<br>';
+        if ($result = $this->db->query($query)) {
+            while($arr = $result -> fetch_assoc()) {
+                $id = $arr['id'];
+                $ret[$id] = $arr;
+            }
+            return $ret;
+        }
+        return false;
+    }
+
     function update_event_daytime_meta ($edt_id, $edt_meta) {
         $edt_meta = $this->db->real_escape_string($edt_meta);
         $query='UPDATE event_daytime
@@ -979,6 +1033,36 @@ class S_event {
         } else {
             echo $query.' on line '.__LINE__.'<br>';
         }
+    }
+
+    function event_daytimes_with_meta($event_id) {
+        $query = 'SELECT * FROM event_daytime 
+            WHERE event_id = '.$event_id.' 
+            AND edt_meta !=""';
+        // debug // 
+        echo "\n\n";
+        echo $query; 
+        echo "\n\n";
+        echo "THAT WAS THE QUERY UP THERE. JUST IN CASE YOU MISS IT HERE IT IS AGAIN\n";
+        echo "\n\n";
+        echo $query; 
+        echo "\n\n";
+
+        if ($result = $this->db->query($query)) {
+            while($arr = $result -> fetch_assoc()) {
+                $id       = $arr['id'];
+                /*
+                $event_id = $arr['event_id'];
+                $daytime  = $arr['daytime'];
+                $edt_meta = $arr['edt_meta';
+                 */
+                // doing you a favor future troy
+                $ret[$id] = $arr;
+            }
+        } else {
+            $ret = false;
+        }
+        return $ret;
     }
 }
 
@@ -3181,4 +3265,12 @@ function datediffInWeeks($date1, $date2) {
     return $ret['weeks'];
 }
 
+function betterDateDiff($date1, $date2) {
+    if($date1 > $date2) return datediffInWeeks($date2, $date1);
+    $first = DateTime::createFromFormat('Y-m-d H:i:s', $date1);
+    $second = DateTime::createFromFormat('Y-m-d H:i:s', $date2);
+    $ret['days']  = $first->diff($second)->days;
+    $ret['weeks'] = ceil($first->diff($second)->days/7);
+    return $ret;
+}
 ?>

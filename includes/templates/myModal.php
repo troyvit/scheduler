@@ -5,11 +5,26 @@
         <h1 id="className"></h1>
         <input type="hidden" id="action" name="action" value="">
         <input type="hidden" id="et_json" name="et_json" value='<?php echo $et_json; ?>'>
+        <input type="hidden" id="bak_event_time" name="bak_event_time" value='<?php echo $event_time; ?>'>
         <input type="hidden" id="eventId" name="event_id" value="<?php echo $event_id; ?>">
         <input type="hidden" id="et_activity_level " name="et_activity_level" value="<?php echo $et_activity_level ; ?>">
         <table class="class_edit">
-            <tr><td colspan="2" style="text-align: center; font-weight: bold; "><?php echo $event_day; ?></td></tr>
-            <tr><td colspan="2" style="text-align: center; font-weight: bold; "><?php echo $event_time; ?></td></tr>
+            <tr><td colspan="2" style="text-align: center; font-weight: bold; "><?php echo $now_dayname.' '.$now_date_display; ?></td></tr>
+            <tr><td>Time</td><td>
+                <select name="event_time" id="event_time">
+                    <?php
+                    foreach($dropdown_time as $time) {
+                        if($time == $event_time) {
+                            $sel = ' SELECTED ';
+                        } else {
+                            $sel = '';
+                        }
+                        echo '<option '.$sel.' value="'.$time.'">'.$time.'</option>';
+                    }
+                    ?>
+                </select>
+                <?php /* echo $event_time; */ ?>
+            </td></tr>
         <?php if($class_dropdown==false) { ?>
             <input type="hidden" id="classId" name="class_id" value="<?php echo $class_id; ?>">
         <?php } else { ?>
@@ -27,22 +42,29 @@
     <?php echo $event_list; ?>
     </select></td>
             </tr>
+        <?php if($et_activity_level == 2) { 
+                // this is a private class and we are also editing a class
+        ?>
 
             <tr class="private_display">
-                <td><?php echo $sl->gp('start date (ignored if group class)'); ?></td>
+                <td><?php echo $sl->gp('start date (ignored if group class)'); echo $et_activity_level .'<br>';?></td>
                 <td><input type="text" class="private_dates" id="private_start" name="private_start" value="<?php echo $private_start; ?>">
+                    <input type="hidden" id="bak_private_start" name="bak_private_start" value="<?php echo $private_start; ?>">
+
             </tr>
             <tr class="private_display">
                 <td><?php echo $sl->gp('end date (ignored if group class)'); ?></td>
                 <td><input type="text" class="private_dates" id="private_end" name="private_end" value="<?php echo $private_end; ?>">
+                    <input type="hidden" id="bak_private_end" name="bak_private_end" value="<?php echo $private_end; ?>">
             </tr>
 
             <tr>
             <td><?php echo $sl->gp('student (ignored if group class)'); ?></td>
                 <td><input type="text" id="private_participant" name="private_participant" value="<?php echo $private_participant; ?>">
                 <input type="hidden" id="private_participant_id" name="private_participant_id" value="<?php echo $private_participant_id; ?>">
+                <input type="hidden" id="bak_private_participant_id" name="bak_private_participant_id" value="<?php echo $private_participant_id; ?>">
             </tr>
-
+        <?php } // end private class / editing ?>
 
 
     <tr><td><?php echo $sl->gp('location'); ?></td><td><select name="location_id" id="location_id"><?php echo $location_list; ?></select></td>
@@ -67,9 +89,9 @@
             </tr>
             <tr>
             <td>
-            <?php echo $sl->gp('occurance rate'); ?></td><td><select name="occurance_rate" id="occurance_rate">
-                <option value="weekly" SELECTED ><?php echo $sl->gp('Weekly'); ?> (<?php echo $sl->gp('default'); ?>)</option>
-                <option value="daily"><?php echo $sl->gp('Daily'); ?></option>
+            <?php echo $sl->gp('occurance rate'); ?></td><td><?php /* echo "it is $occurance_rate <br>"; */ ?><select name="occurance_rate" id="occurance_rate">
+                <option value="weekly" <?php if($occurance_rate == 'weekly' || !isset($occurance_rate)) { echo ' SELECTED '; } ?> ><?php echo $sl->gp('Weekly'); ?> (<?php echo $sl->gp('default'); ?>)</option>
+                <option value="daily"  <?php if($occurance_rate == 'daily')  { echo ' SELECTED '; } ?> ><?php echo $sl->gp('Daily');  ?> </option>
             </select>
 
         <div id="day_boxes" style="display: none; width:20%; float: left; margin-top: 27px; margin-left: 18px;">
