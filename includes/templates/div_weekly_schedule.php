@@ -79,26 +79,24 @@ foreach($betterweek as $cal_date => $current_day_number) {
             $rowspan='rowspan='.$rowspan; 
             // $rowspan='';
             $rowheight=ceil($time_row_height_multiplier * $longest_duration);
-            // $rhstyle='style="height: '.$rowheight.'px;"';
             $count_rs=true;
         }  else {
             $rowspan='';
-            $rhstyle='';
         }
         // $div_height=$total_duration+30;
-        $div_height=30;
-        $rhstyle='height: '.$div_height.'px; ';
+        $div_height=40;
         // echo '<div style="display: block; border-bottom: 1px solid #fabaca;" class="time_row '.$first_row_class.' " id="'.$date_stamp.'">'; // contains time and event
         echo '<div style="border-bottom: 1px solid #fabaca;" class="time_row '.$first_row_class.' " id="'.$date_stamp.'">'; // contains time and event
         echo '<div style="border:0px solid green; " class="time_cell">'; // time of day goes here
             echo '<span class="'.$extra_span_styles.'">'.$time_display.'</span>';
         if(is_array($e[$check_event])) {
             $rscounter=1;
-                $extra_event_cell_class=' active ';
-                $event_increment=0;
-		$event_count = count($e[$check_event]);
-                $each_event_width = floor(100/$event_count) -2;
-		$extra_event_class = '';
+            $extra_event_cell_class=' active ';
+            $event_increment=0;
+		    $event_count = count($e[$check_event]);
+            $each_event_width = floor(100/$event_count) -2;
+            $each_event_margin_left = floor(100/$event_count) -2;
+		    $extra_event_class = '';
                 foreach($e[$check_event] as $val) {
                     /* extract($val); */
                     $daytime                   = $val['daytime'];
@@ -112,15 +110,18 @@ foreach($betterweek as $cal_date => $current_day_number) {
                     $id                        = $val['id'];
                     $participant_fullname      = $val['participant_fullname'];
                     $duration                  = $val['duration'];
+                    // $duration_height           = round(36*$duration/5);
                     $duration_height           = round(36*$duration/5);
                     $event_type                = $val['event_type'];
                     $private_event_daytime_id  = $val['private_event_daytime_id'];
                     if($event_increment > 0) {
                         // $extra_event_class = ' event_daily_display_mult ';
-                        // $extra_event_style= 'margin-left: 48px; margin-bottom: -180px;';
+                        $event_margin_style = 'margin-left: '.$each_event_margin_left.'%; ';
+                        $each_event_margin_left += $each_event_margin_left;
                     } else {
                         // $extra_event_class = '';
                         // $extra_event_style= 'margin-left: 74px;';
+                        $event_margin_style = '';
                     }
                     // calculate the height of it
                     // check here
@@ -128,12 +129,12 @@ foreach($betterweek as $cal_date => $current_day_number) {
                     // get the duration / time_constraint
                     $duration_chunk=floor($duration/$tc);
                     // 30 minutes should give us 6 if the time constraint is 5 minutes
-                    $new_height = $duration_chunk*$div_height;
-		            $new_height='default';
+                    $new_height = $duration_chunk*$div_height; //HAHAHA
+		            // $new_height='default';
 		            // $new_height=$duration_height; // I see I've been here a few times
                     // $extra_event_style.=' height: '.$new_height.'px; ';
                     // $extra_event_style.=' position:relative; bottom: '.$div_height.'px; ';
-                    $extra_event_style = ' width: '.$each_event_width.'%; height: '.$new_height.'px ';
+                    $extra_event_style = ' width: '.$each_event_width.'%; height: '.$new_height.'px; '.$event_margin_style;
 
                     if($privgroup=='private') {
                         // include student name

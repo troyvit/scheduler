@@ -1696,6 +1696,7 @@ if(ca($action) == 'daily_schedule') {
             $leader             = $leader_arr[$leader_id];
             $event_day          = $ga['event_day'];
             $daytime            = $ga['daytime'];
+            $duration           = $ga['duration'];
             $event_day_arr      = date_parse ( $daytime );
             $lna = explode(" ", $leader); // leader name array
             $dot = '';
@@ -1827,12 +1828,31 @@ if(ca($action) == 'daily_schedule') {
                     'leader_ini'    => $ini,
                     'event_day'     => $event_day,
                     'daytime'       => $daytime,
+                    'duration'      => $duration,
                     'event_day_arr' => $event_day_arr,
                     'edt_meta'      => $edt_meta,
                 );
                 // echo "we just saved "; echo $login_text_data; echo " into day_arr, using $id as the id <br>";
                 // echo "we just saved "; echo $students[$id]; echo " into day_arr, using $id as the id <br>";
-                // $n_rowspan[$twentyfour_hour][$minutes] += count($day_arr[$twentyfour_hour][$minutes]['group']);
+              // $n_rowspan[$twentyfour_hour][$minutes] += count($day_arr[$twentyfour_hour][$minutes]['group']);
+                if($class_id == 0) {
+                    // this is a private class
+                    // if duration > 10 we need to clone it and show it for the next period as well
+                    if($duration > 10) { // I hate myself
+                        $priv_dt = new DateTime($daytime);
+                        $subdur_string = '10 minute';
+                        $new_num_minutes = 10;
+                        while($new_num_minutes < $duration) {
+                            $new_num_minutes = $new_num_minutes + 10; // I still hate myself
+                            echo "for $id new_num_minutes is $new_num_minutes and duration is $duration <br>";
+                            date_add($priv_dt, date_interval_create_from_date_string ($subdur_string));
+                            $new_twentyfour = $priv_dt -> format('G');
+                            $new_minute    = $priv_dt -> format('i');
+                            $rowcount[$new_twentyfour][$new_minute]++;
+                            $day_arr[$new_twentyfour][$new_minute]['group'][$id] = $day_arr[$twentyfour_hour][$minutes]['group'][$id];
+                        }
+                    }
+                }
             }
         }
     }

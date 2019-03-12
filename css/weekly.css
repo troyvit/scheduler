@@ -202,14 +202,15 @@ table.day_container td {
 
 table.day_container .active { /* background-color:#ffffee; */ margin: 4px;}
 
-table.day_container .event { padding: 4px 4px 0px 2px; margin-left: 74px;}
+table.day_container .event { position: relative; padding: 4px 4px 0px 2px; margin-left: 74px;}
 
 div.time_top_row {
     margin-top: 12px;
 }
 div.time_row {
     height: auto;
-    min-height: 3em;
+    height: 40px;
+    /* min-height: 3em; */
 }
 
 body td.day_name_container {
@@ -228,13 +229,15 @@ div.event_daily_display {
     width: 165px;
     border: 1px solid black;
     /* background-color: #a4bafa; */
-    background-color: #89abcd;
+    /* background-color: #89abcd; */
+    background-color: rgba(137,171,205,0.9);
     margin-right: 1%;
     float: left;
-    position: relative;
-    bottom: 2em;
+    position: absolute;
+    top: -20px;
     font-size: larger;
     padding: 3px;
+    opacity: .9;
     
 }
 
@@ -244,8 +247,8 @@ div.time_cell {
 
 div.event_daily_display:hover {
     box-shadow: 2px 2px 2px #888888;
-    position: relative;
-    /* z-index: 600; */
+    /* position: relative; */
+    z-index: 600;
     cursor: pointer;
 }
 
