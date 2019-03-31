@@ -11,11 +11,10 @@ date_default_timezone_set('America/Los_Angeles'); // REALLY?!?!
 require('../includes/config.php');
 require('../includes/functions.php');
 
-$price['group']=390;
-$amount_due = $price['group']; // you so funny troy
+$amount_due = $price['group']; // you so funny troy // this is set in config.php
 
-$cf_id=20; // copy-from id
-$ct_id=21; // copy-to id
+$cf_id=21; // copy-from id
+$ct_id=22; // copy-to id
 
 /* you need to set up an array of days that represent the 1st 5 days of the new schedule's week.
  * $day['Monday']=2013-06-13 (or more appropriately probably the timestamp);
@@ -40,13 +39,13 @@ $sd['Sunday']    = date('Y-m-d', mktime (0,0,0, 6, 9, 2013));
 // I can't believe I still have to do this
 // | 10 | Summer 2015 | 2015-06-01 | 2015-08-14 |
 //
-$sd['Monday']    = date('U-n-j-Y', mktime (0,0,0, 12, 17, 2018));
-$sd['Tuesday']   = date('U-n-j-Y', mktime (0,0,0, 12, 18, 2018));
-$sd['Wednesday'] = date('U-n-j-Y', mktime (0,0,0, 12, 19, 2018));
-$sd['Thursday']  = date('U-n-j-Y', mktime (0,0,0, 12, 20, 2018));
-$sd['Friday']    = date('U-n-j-Y', mktime (0,0,0, 12, 21, 2018));
-$sd['Saturday']  = date('U-n-j-Y', mktime (0,0,0, 12, 22, 2018));
-$sd['Sunday']    = date('U-n-j-Y', mktime (0,0,0, 12, 23, 2018));
+$sd['Monday']    = date('U-n-j-Y', mktime (0,0,0, 6, 3, 2019));
+$sd['Tuesday']   = date('U-n-j-Y', mktime (0,0,0, 5, 28, 2019));
+$sd['Wednesday'] = date('U-n-j-Y', mktime (0,0,0, 5, 29, 2019));
+$sd['Thursday']  = date('U-n-j-Y', mktime (0,0,0, 5, 30, 2019));
+$sd['Friday']    = date('U-n-j-Y', mktime (0,0,0, 5, 31, 2019));
+$sd['Saturday']  = date('U-n-j-Y', mktime (0,0,0, 6, 1, 2019));
+$sd['Sunday']    = date('U-n-j-Y', mktime (0,0,0, 6, 2, 2019));
 
 /* ok since it bugs me every time. All I really need is the start date.
  * then while($i < 7) { get the next day's date in U-m-j-Y format an the next day's date in l format (that's a lowercase L).
@@ -90,7 +89,7 @@ $occurance_rate = 'weekly';
     // $e_res = $s_event -> event_by_location(1);
 
     // get all lap pool events
-    $e_res = $s_event -> event_by_location(2); 
+    $e_res = $s_event -> event_by_location(1); 
 
     // billing stuff
     $event_line_item_id=1; // this pretty much shows where I'm at with that

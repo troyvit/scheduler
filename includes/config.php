@@ -67,6 +67,7 @@ $has_config=true;
 // $default_class_id=14; // fall 2016
 // $default_class_id=19; // summer 2018
 $default_class_id=21; // spring 2019
+// $default_class_id=22; // summer 2019
 
 // login defaults
 // $logout_hours = 24; // after 24 hours you are logged out
@@ -110,7 +111,7 @@ $lang='en';
 // $price['group']=546;
 // $price['group']=286;
 // $price['group']=66;
-$price['group']=67;
+$price['group']=308;
 
 $price['SWM'] = 670; // in db
 $price['FLT'] = 450; // in db
