@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL & ~E_NOTICE);
 class Db_connect {
     public $mysqli;
     var $database_host;
@@ -460,8 +461,7 @@ class S_class {
             $ins='INSERT INTO event_daytime(event_id, daytime)
                 VALUES ('.$event_id.', "'.$e_datetime.'")';
             if($toinsert === true) {
-                // debug // 
-                echo $ins."\n";
+                // debug // echo $ins."\n";
                 $result = $this->db->query($ins);
             }
             $event_date      = date('Y-m-d', mktime(0,0,0,$this_month, $current_day_number+$inc_num, $this_year));

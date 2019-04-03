@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL & ~E_NOTICE);
 session_save_path('/var/tmp');
 ini_set('session.gc_probability', 1);
 session_start();
@@ -1641,7 +1642,8 @@ if(ca($action) == 'daily_schedule') {
     if(is_array($class_arr)) {
         $class_id = $class_arr['id'];
     } else {
-        $class_id = $default_class_id;
+        // $class_id = $default_class_id; // whatevs
+        $class_id = $_REQUEST['class_id'];
     }
     // debug // echo '<br>'.$class_id.'</br>';
     $s_class -> class_id = $class_id;
@@ -1750,7 +1752,7 @@ if(ca($action) == 'daily_schedule') {
                         $login_fullname='Unknown parent';
                     }
                     // $students.="$name, $age<br>";
-                    $age_name=' months ';
+                    $age_name=' mos ';
                     $plural = '';
                     if($age >= $age_month_cutoff) {
                         // this kid is too old to have an age expressed in months
@@ -1760,7 +1762,7 @@ if(ca($action) == 'daily_schedule') {
                         if($age > 1) {
                             $plural='s';
                         }
-                        $age_name = 'year'.$plural;
+                        $age_name = 'yr'.$plural;
                     }
                     // $dateofbirth[$id] .= $agebr.$dob.'<br>'.$age.' '.$age_name;
                     // $dateofbirth[$id] .= $agebr.$age.' '.$age_name.'<br>'.$dob;;
@@ -1794,12 +1796,12 @@ if(ca($action) == 'daily_schedule') {
                     // find out what week we're in
                     // debug // echo "the start is $start and now is $now for $event_id<br>";
                     $week_no     = datediffInWeeks($start, $now);
-                    $total_weeks = datediffInWeeks($start, $end);
-                    $weeks_plus_attendance = $week_no + $attendance;
-                    if($week_no == 0) {
+                    if($week_no == 0 && $attendance < 1) { // only increment the week by 1 if there is no attendance setting in place
                         // day 1 of the class I guess?
                         $week_no = 1;
                     }
+                    $total_weeks = datediffInWeeks($start, $end);
+                    $weeks_plus_attendance = $week_no + $attendance;
                     // $week_no = "$week_no/$total_weeks";
                     $week_no = "$weeks_plus_attendance/"; // combines with # weeks attached to classname now
                 } else {
@@ -1844,7 +1846,7 @@ if(ca($action) == 'daily_schedule') {
                         $new_num_minutes = 10;
                         while($new_num_minutes < $duration) {
                             $new_num_minutes = $new_num_minutes + 10; // I still hate myself
-                            echo "for $id new_num_minutes is $new_num_minutes and duration is $duration <br>";
+                            // echo "for $id new_num_minutes is $new_num_minutes and duration is $duration <br>";
                             date_add($priv_dt, date_interval_create_from_date_string ($subdur_string));
                             $new_twentyfour = $priv_dt -> format('G');
                             $new_minute    = $priv_dt -> format('i');
@@ -1876,7 +1878,7 @@ if(ca($action) == 'daily_schedule') {
     <th class="daily_header daily_students"><span class="phrase">student</span></th>
     <th class="daily_header daily_dob"><span class="phrase">Age/DOB</span></th>
     <th class="daily_header daily_login"><span class="phrase">parent</span></th>
-    <th class="daily_header daily_week"><span class="phrase">wk/Event-Inst</span></th>
+    <th class="daily_header daily_week"><span class="phrase">wk/Event</span></th>
     <th class="daily_header daily_location"><span class="phrase">pool</span></th>
     <th class="daily_header daily_notes"><span class="phrase">notes</span></th>
     </tr>';
@@ -1976,7 +1978,7 @@ if(ca($action) == 'daily_schedule') {
                         // can I ... add the same date twice?
                         // let's just say the regret goes waaayyy beyond that extract()
                         // not sure why this age stuff is here
-                        $age_name=' months ';
+                        $age_name=' mos ';
                         $plural = '';
                         if($age >= $age_month_cutoff) {
                             // echo "age is $age and age_month_cutoff is $age_month_cutoff for $fullname <br>";
@@ -1985,7 +1987,7 @@ if(ca($action) == 'daily_schedule') {
                             if($age > 1) {
                                 $plural='s';
                             }
-                            $age_name = 'year'.$plural;
+                            $age_name = 'yr'.$plural;
                         }
                         if($key == 'group' ) { // group/private is obsolete but I don't wanna unwind this code
                             // sorry future Troy
@@ -2002,7 +2004,7 @@ if(ca($action) == 'daily_schedule') {
             <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_students">'.$students.'</td>
             <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_dob">'.$dateofbirth.'</td>
             <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_login">'.$login_data.'</td>
-            <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_week">'.$week_no.$et_code.' - '.$leader_ini.'</td>
+            <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_week">'.$week_no.$et_code.'<!-- - '.$leader_ini.'--></td>
             <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_location">'.$location.'</td>
             <td class="rowcount_'.$ec_counter.' '.$td_extraclass.' daily_box daily_notes edt_meta" id="edt_meta_'.$edt_id.'">
                 <span id = "edt_show_'.$edt_id.'">'.$edt_meta.'</span>
@@ -2432,6 +2434,10 @@ if(ca($action) == 'get_event') {
         $week_no     = datediffInWeeks($start, $now);
         $total_weeks = datediffInWeeks($start, $end);
         $weeks_plus_attendance = $week_no + $attendance;
+        if($weeks_plus_attendance == 0) {
+            echo "it is 0 so let's add one";
+            $weeks_plus_attendance++;
+        }
         echo "start is $start and now is $now and week_no is $week_no and attendance is $attendance so wpa is $weeks_plus_attendance <br>";
     }
     // I have a variable conflict and am solving it in a stupid way
@@ -2697,7 +2703,7 @@ if(ca($action) == 'get_events') {
     $s_result = $s_class->get_class();
     $class_row = $s_result->fetch_assoc();
     $class_name = $class_row['name'];
-    if($_REQUEST['et_id']*1 > 0) {
+    if(isset($_REQUEST['et_id']) && ($_REQUEST['et_id'] *1 > 0 || $_REQUEST['et_id'] == 0)) {
         $e_res=$s_event->get_event_by_type($_REQUEST['et_id']);
     } elseif($_REQUEST['day'] *1 > 0) {
         $class_id=$_REQUEST['class_id'];

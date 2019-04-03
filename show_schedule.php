@@ -84,18 +84,30 @@ require ('includes/head_include.php'); ?>
 
     #hold_daily_schedule td {
         /* border-bottom: 1px solid red; */
+        /* width: calc(100% + 50px); */
     }
 
 
-    #hold_daily_schedule .daily_schedule_participant, 
-    #hold_daily_schedule .daily_age,
-    #hold_daily_schedule .login_link,
-    #hold_daily_schedule .class_code
+    #hold_daily_schedule td.daily_schedule_students, 
+    #hold_daily_schedule td.daily_dob,
+    #hold_daily_schedule td.daily_login,
+    #hold_daily_schedule td.daily_week
+    #hold_daily_schedule td.daily_location,
+    #hold_daily_schedule td.daily_notes
     {
         /* width: 100% !important;
         border-bottom: 1px solid #000000 !important;
         */  
+/*
         margin-bottom: 20px;
+        font-size:20px !important;
+*/
+    }
+
+    #hold_daily_schedule td.daily_box, #hold_daily_schedule th.daily_header
+    {
+        margin-bottom: 20px;
+        font-size:20px !important;
     }
 
     h2 { color: #ff0000; }
