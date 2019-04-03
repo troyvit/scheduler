@@ -2178,6 +2178,23 @@ class S_participant extends S_login {
         }
     }
 
+    function get_all_participants_plus_login($orderby='') {
+        if(strlen($orderby) > 0) {
+            $orderby = ' ORDER BY '.$orderby;
+        }
+        $query='SELECT login_participant.login_id as login_id, participant.id as id, participant.id as participant_id, participant.fname, participant.lname, participant.dob, participant.p_meta 
+            FROM participant 
+            LEFT JOIN login_participant ON participant.id = login_participant.participant_id
+            WHERE (login_participant.login_id !="" AND login_participant.login_id IS NOT NULL) '.
+            $orderby;
+        if ($result = $this->db->query($query)) {
+            return $result;
+        } else {
+            echo '<br><br><br>arg';
+            echo $query.'<br>';
+        }
+    }
+
     function get_all_participants($orderby='') {
         if(strlen($orderby) > 0) {
             $orderby=' ORDER BY '.$orderby;
@@ -2292,10 +2309,14 @@ class S_participant extends S_login {
             $stat_clause = ' WHERE event_participant.status_id='.$status_id;
         }
         $query='SELECT event_participant.*,
-            event_participant.id as ep_id
+            event_participant.id as ep_id,
+            login_participant.login_id,
+            participant.fname, participant.lname 
             FROM event_participant
             LEFT JOIN event ON event.id=event_participant.event_id
-            LEFT JOIN class on event.class_id=class.id '.$stat_clause.' 
+            LEFT JOIN class on event.class_id=class.id 
+            LEFT join login_participant ON event_participant.participant_id = login_participant.participant_id 
+            LEFT join participant ON event_participant.participant_id = participant.id '.$stat_clause.' 
             '.$join.' class.id='.$class_id;
         // debug // echo $query;
         if ($result = $this->db->query($query)) {

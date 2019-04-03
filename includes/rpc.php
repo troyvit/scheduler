@@ -2912,11 +2912,8 @@ if(ca($action) == 'download_class_students') {
         die('specifiy a class');
     }
     foreach($ap as $var => $val) {
-        // print_r($val);
+        print_r($val);
         extract($val);
-        $result = $s_participant -> get_participant($participant_id);
-        $part_row = $result->fetch_assoc();
-        extract($part_row);
         // now time to shoot a squirrel with a howitzer
         $event_res = $s_event -> better_get_event($event_id);
         $event_data = $event_res->fetch_assoc();
@@ -3764,7 +3761,7 @@ if(ca($action) == 'get_participants_json') {
     // I'm too tired to write a new function right now
     if($_REQUEST['class_id'] == 'all' || $_REQUEST['class_id']=='') {
         $need_p_names=false;
-        $p_res = $s_participant -> get_all_participants('fname');
+        $p_res = $s_participant -> get_all_participants_plus_login('participant.fname');
     } else {
         $need_p_names=true;
         $class_id = (empty($_REQUEST['class_id'])) ? $default_class_id : $_REQUEST['class_id'];
@@ -3776,28 +3773,18 @@ if(ca($action) == 'get_participants_json') {
     $ret='[';
     foreach($p_arr as $val) {
         $id              = $val['id'];
-        $event_id        = $val['event_id'];
         $participant_id  = $val['participant_id'];
-        $status_id       = $val['status_id'];
-        $ep_meta         = $val['ep_meta'];
-        if($need_p_names == true) {
-            $participant_res = $s_participant -> get_participant($participant_id);
-            $participant_arr=$participant_res -> fetch_assoc();
-            $fname=trim($participant_arr['fname']);
-            $lname=trim($participant_arr['lname']);
-            $id=trim($participant_arr['id']);
-        } else {
-            $fname=trim($val['fname']);
-            $lname=trim($val['lname']);
-            $id=trim($val['id']);
-        }
+        $fname           = trim($val['fname']);
+        $lname           = trim($val['lname']);
+        $p_meta          = $val['p_meta'];
+        $login_id        = $val['login_id'];
         // get login id
-        $l_res = $s_participant -> get_logins_by_participant ($participant_id);
-        $l_arr = $l_res ->fetch_assoc();
-        $login_id = $l_arr['id'];
+        // $l_res = $s_participant -> get_logins_by_participant ($participant_id);
+        // $l_arr = $l_res ->fetch_assoc();
+        // $login_id = $l_arr['id'];
         // echo '<pre>';
         // print_r($l_arr);
-        $login_id = $l_arr['id'];
+        // $login_id = $l_arr['id'];
         $ret.="$comma { \"value\": \"$fname $lname\", \"participant_id\": \"$id\", \"login_id\": \"$login_id\" }";
         $comma=",";
     }
